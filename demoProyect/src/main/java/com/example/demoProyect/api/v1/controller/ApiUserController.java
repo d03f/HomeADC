@@ -31,13 +31,13 @@ public class ApiUserController {
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> getAccountKeyOfUserPasswd(@RequestBody Map<String, String> requestData) {
-
 		String username = requestData.get("username");
 		String password = requestData.get("password");
 		
 		try {
 			return CustomResponseOk.build( 
-					this.apiUserService.loginUserAndGetAccountKey(username, password)					
+					java.util.Map.of("userAccountKey", this.apiUserService.loginUserAndGetAccountKey(username, password) )
+									
 				);
 		} catch (CustomException e) {
 			return CustomResponseError.build( e.getMessage() );

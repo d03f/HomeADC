@@ -57,7 +57,8 @@ public class ApiUserFakeImplemt implements ApiUserDao {
 
 	@Override
 	public Optional<String> getPasswordOfUsername(String searchUsername) {
-		return "error".equals(searchUsername) ? Optional.empty() :Optional.of("passwrod");
+		//Always return the hashed password "test" exceptn when username equals "error"
+		return "error".equals(searchUsername) ? Optional.empty() : Optional.of("$2a$10$nZF8GQ1ka8J9mRx4nAgeHOzGQUr4VfDUvzzIFuNy5ASctji31qyqu");
 	}
 
 

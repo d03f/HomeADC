@@ -3,6 +3,7 @@ package com.example.demoProyect.api.v1.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidCredentialsCustEx;
@@ -14,38 +15,39 @@ import com.example.demoProyect.api.v1.repository.ApiUserDao;
 public class ApiUserService {
 	
 	private final ApiUserDao apiUserDao;
+	private final PasswordEncoder passwordEnc;
 	
-	public ApiUserService(ApiUserDao apiUserDao) {
+	public ApiUserService(ApiUserDao apiUserDao, PasswordEncoder passwordEnc) {
 		this.apiUserDao = apiUserDao;
+		this.passwordEnc = passwordEnc;
 	}
 	
-	public String loginUserAndGetAccountKey(String username, String password) throws InvalidCredentialsCustEx, InvalidUserAccountKeyCustEx {
-		//TODO the hashing
-		Optional<String> storedPasswd = this.apiUserDao.getPasswordOfUsername(username);
-		//TODO take a look at the commented line
-		if (storedPasswd.isEmpty() /* || storedPasswd.get() != password*/) { throw new InvalidCredentialsCustEx();}
+	public String loginUserAndGetAccountKey(String username, String rawPassword) throws InvalidCredentialsCustEx, InvalidUserAccountKeyCustEx {
+		String storedHashPassword = this.apiUserDao.getPasswordOfUsername(username)
+											.orElseThrow( InvalidUserAccountKeyCustEx::new );
 		
+		if ( !this.passwordEnc.matches( rawPassword, storedHashPassword ) ) { throw new InvalidCredentialsCustEx(); }
 		
-		Optional<String> accountKey = this.apiUserDao.getUserAccountKey(username);
-		if (accountKey.isEmpty()) { throw new InvalidUserAccountKeyCustEx(); }
-		
-		return accountKey.get();
+		return this.apiUserDao.getUserAccountKey(username)
+						.orElseThrow( InvalidUserAccountKeyCustEx::new );
 	}
 	
 	public ApiUser getCurrentUser(String authorizationHeader) throws InvalidUserAccountKeyCustEx {
-		Optional<String> parsedKey = this.parseAccountKeyFromHeader(authorizationHeader);
-		if (parsedKey.isEmpty()|| !this.isAccountKeyValid(parsedKey.get())) { throw new InvalidUserAccountKeyCustEx(); }
+		String parsedKey = this.parseAccountKeyFromHeader(authorizationHeader)
+										.orElseThrow(InvalidUserAccountKeyCustEx::new);
 
+		if ( !this.isAccountKeyValid(parsedKey) ) { throw new InvalidUserAccountKeyCustEx(); }
 				
-		Optional<ApiUser> data = this.apiUserDao.getApiUserFromAccountKey(parsedKey.get());
-		return data.get();
+		return this.apiUserDao.getApiUserFromAccountKey(parsedKey)
+						.orElseThrow();
 	}
 	
 	public List<String> getApiKeysFromAccountKey(String authorizationHeader) throws InvalidUserAccountKeyCustEx{
-		Optional<String> parsedKey = this.parseAccountKeyFromHeader(authorizationHeader);
-		if (parsedKey.isEmpty() || !this.isAccountKeyValid(parsedKey.get())) { throw new InvalidUserAccountKeyCustEx(); }
+		String parsedKey = this.parseAccountKeyFromHeader(authorizationHeader)
+				.orElseThrow(InvalidUserAccountKeyCustEx::new);
+		if (!this.isAccountKeyValid(parsedKey)) { throw new InvalidUserAccountKeyCustEx(); }
 		
-		return this.apiUserDao.getApiKeysFromAccountKey(parsedKey.get());
+		return this.apiUserDao.getApiKeysFromAccountKey(parsedKey);
 		
 	}
 	

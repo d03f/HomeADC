@@ -7,5 +7,4 @@ public abstract class CustomException extends Exception {
 	protected CustomException(String msg) {
 		super(msg);
 	}
-
 }
