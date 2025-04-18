@@ -1,152 +1,193 @@
 <!-- This is a basic concept of spliting vert and hor a div and create childen ones based on the positon of the click -->
 
-
+<!DOCTYPE html>
 <html>
 
-  <head>
-    <style>
-      #mainParent {
-        background-color: red;
-        width: 100%;
-        height: 100%;
-        align-items: end;
+<head>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%; 
+    }
+
+
+    #mainParent {
+      background-color: red;
+      width: 100%;
+      height: 100%;
+      align-items: end;
+    }
+
+    .splitable {
+      display: flex;
+      flex-direction: row;
+
+    }
+
+    .spacer {
+      background-color: red;
+
+    }
+  </style>
+</head>
+
+
+<body onload="onPageLoad()">
+
+  <div id="mainParent" class="splitable" onclick="logClick(event)" oncontextmenu="logClick(event, false)">
+
+  </div>
+
+</body>
+
+<script>
+
+  function onPageLoad(){
+    historic = new HistoryModifier()
+
+    document.addEventListener('keydown', function(event) {
+      if ( event.ctrlKey  && event.key === 'z') {
+        event.preventDefault();
+        historic.undoLastChange();
       }
-  
-      .splitable {
-        display: flex;
-        flex-direction: row;
-  
-      }
-    </style>
-  </head>
+    })
 
-  
-  <body>
-
-    <div id="mainParent" class="splitable" onclick="logClick(event)" oncontextmenu="logClick(event, false)">
-
-    </div>
-
-  </body>
-
-  <script>
-
-
-
-    function logClick(event, horizontal=true){
-      event.stopPropagation()
-      console.log(event.target.id)
-  
-      
-  
-      let generator = new DivGenerator()
-  
-      let positions = EventClickParser.getPercPosition(event)
-      let newPosDivs = horizontal ? generator.createHorizDiv(positions[0]) : generator.createVertDiv(positions[1])
-  
-  
-      generator.appendChildrenAndCustomice(event.target, newPosDivs, horizontal)
-  
-  
-  
-  
-      event.preventDefault();
-  
   }
-  
-  
-  class EventClickParser{
-      static getPercPosition( event){
-          let heightPercent = event.offsetY / event.target.clientHeight
-          let widthPercent =  event.offsetX  / event.target.clientWidth 
-  
-          console.log(event.clientX)
-                  
-  
-          return [widthPercent, heightPercent]
-      }
-  }
-  
-  class DivGenerator{
-      
-      #onClickValue       = "logClick(event)"
-      #onContextMenuValue = "logClick(event, false)"
-      #classValue         = "splitable"
-      
-  
-      appendChildrenAndCustomice(target, children, horizontal=true){
-  
-          target.style.flexDirection = horizontal ? "row" : "column"
-  
-  
-          children.forEach(child => {
-              target.appendChild(child)
-          });
-      }
-  
-  
-      createHorizDiv(widthSplit){
-          
-          let clickWidth = Math.floor(widthSplit*100)
-          
-          let elem1 = this.#createDiv(clickWidth, 100)
-  
-          let elem2 = this.#createDiv(100 - clickWidth, 100)
-  
-  
-          
-      
-          return [elem1, elem2]
-      }
-  
-      createVertDiv(heightSplit){
-          
-          let clickHeight = Math.floor(heightSplit*100)
-  
-          
-          let elem1 = this.#createDiv(100, clickHeight)
-  
-          let elem2 = this.#createDiv(100, 100 - clickHeight)
-  
-  
-          
-      
-          return [elem1, elem2]
-      }
-  
-      #createDiv(width, height, color=this.#generateRandomCSSColor()){
-          let elem = document.createElement("div")
-  
-          
-          elem.style.width = width + "%"
-          elem.style.height = height  + "%"
-      
-          elem.style.backgroundColor = color
-  
-          elem.classList.add(this.#classValue)
-          elem.onclick = this.#onClickValue
-  
-          elem.id = Math.random().toString(36).substring(2, 12)
-  
-          
-          return elem
-      }
-  
-      #generateRandomCSSColor() {
-          // Generate random values for Red, Green, and Blue (0-255)
-          const red = Math.floor(Math.random() * 256);
-          const green = Math.floor(Math.random() * 256);
-          const blue = Math.floor(Math.random() * 256);
-        
-          // Return the color in RGB format
-          return `rgb(${red}, ${green}, ${blue})`;
-        }
-  
-  }
-  
+
   
 
-  </script>
+  function logClick(event, horizontal = true) {
+    event.stopPropagation()
+
+
+
+    let generator = new DivGenerator()
+
+    let positions = EventClickParser.getPercPosition(event)
+    let newPosDivs = horizontal ? generator.createHorizDiv(positions[0]) : generator.createVertDiv(positions[1])
+
+
+
+    generator.appendChildrenAndCustomice(event.target, newPosDivs, horizontal)
+
+    historic.addNewChange(newPosDivs)
+
+
+
+
+    event.preventDefault();
+
+  }
+
+
+  class HistoryModifier {
+
+    itemsAdded = []
+
+    addNewChange(items){ this.itemsAdded.push(items) }
+
+    undoLastChange(){
+      let lastChange = this.itemsAdded.pop()
+      for (let idx in lastChange){
+        lastChange[idx].remove()
+      }
+      
+    }
+
+  }
+
+
+  class EventClickParser {
+    static getPercPosition(event) {
+      let heightPercent = event.offsetY / event.target.clientHeight
+      let widthPercent = event.offsetX / event.target.clientWidth
+
+
+      return [widthPercent, heightPercent]
+    }
+  }
+
+  class DivGenerator {
+
+    #onClickValue = "logClick(event)"
+    #onContextMenuValue = "logClick(event, false)"
+    #classValue = "splitable"
+
+
+    #divPercentSize = "5"
+
+    
+
+    appendChildrenAndCustomice(target, children, horizontal = true) {
+
+      target.style.flexDirection = horizontal ? "row" : "column"
+
+
+      children.forEach(child => {
+        target.appendChild(child)
+      });
+    }
+
+
+    createHorizDiv(widthSplit) {
+
+      let clickWidth = Math.floor(widthSplit * 100)
+
+      let elem1 = this.#createDiv(clickWidth, 100)
+      let elem2 = this.#createDiv(100 - clickWidth, 100)
+
+
+      return [elem1,  elem2]
+    }
+
+    createVertDiv(heightSplit) {
+
+      let clickHeight = Math.floor(heightSplit * 100)
+
+
+      let elem1 = this.#createDiv(100, clickHeight)
+      let elem2 = this.#createDiv(100, 100 - clickHeight)
+      
+
+      return [elem1,  elem2]
+    }
+
+
+    #createDiv(width, height, color = this.#generateRandomCSSColor()) {
+      let elem = document.createElement("div")
+
+
+      elem.style.width = width + "%"
+      elem.style.height = height + "%"
+
+      elem.style.backgroundColor = color
+
+      elem.classList.add(this.#classValue)
+      elem.onclick = this.#onClickValue
+
+      elem.id = Math.random().toString(36).substring(2, 12)
+
+
+      return elem
+    }
+
+    #generateRandomCSSColor() {
+      // Generate random values for Red, Green, and Blue (0-255)
+      const red = Math.floor(Math.random() * 256);
+      const green = Math.floor(Math.random() * 256);
+      const blue = Math.floor(Math.random() * 256);
+
+      // Return the color in RGB format
+      return `rgb(${red}, ${green}, ${blue})`;
+    }
+
+  }
+
+
+
+</script>
 
 
 
