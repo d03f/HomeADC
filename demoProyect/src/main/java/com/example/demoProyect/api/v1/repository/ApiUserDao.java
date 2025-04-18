@@ -1,6 +1,5 @@
 package com.example.demoProyect.api.v1.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -16,9 +15,5 @@ public interface ApiUserDao {
 	public Optional<String> getUserAccountKey(String searchUserName);
 	
 	public Optional<ApiUser> getApiUserFromAccountKey(String userAcountKey);
-	
-	public List<String> getApiKeysFromAccountKey(String accountKey);
-	
-	
 
 }

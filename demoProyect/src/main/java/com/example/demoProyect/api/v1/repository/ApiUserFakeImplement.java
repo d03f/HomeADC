@@ -12,7 +12,7 @@ import com.example.demoProyect.api.v1.model.UserRole;
 
 
 @Repository
-public class ApiUserFakeImplemt implements ApiUserDao {
+public class ApiUserFakeImplement implements ApiUserDao {
 	
 	
 	private final List<ApiKey> exampleKeys = java.util.List.of(
@@ -43,15 +43,6 @@ public class ApiUserFakeImplemt implements ApiUserDao {
 				new java.util.ArrayList<>() )
 			);
 	}
-	
-	
-
-
-	@Override
-	public List<String> getApiKeysFromAccountKey(String accountKey) {
-		return this.exampleKeys.stream().map(ApiKey::getApiKeyValue).toList();
-	}
-
 
 
 

@@ -56,17 +56,7 @@ public class ApiUserController {
 		}
 	}
 	
-	@GetMapping("/me/myapikeys")
-	public ResponseEntity<?> getApiKeysOfCurrentUser( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
-		try {
-			return CustomResponseOk.build( 
-					this.apiUserService.getApiKeysFromAccountKey(authorizationHeader) 
-				);
-		} catch ( InvalidUserAccountKeyCustEx e) {
-			return CustomResponseError.build( e.getMessage() );
-		}
-		
-	}
+
 	
 	
 	

@@ -17,9 +17,12 @@ public class ApiUserService {
 	private final ApiUserDao apiUserDao;
 	private final PasswordEncoder passwordEnc;
 	
-	public ApiUserService(ApiUserDao apiUserDao, PasswordEncoder passwordEnc) {
+	private final RequestDataParserService dataParser;
+	
+	public ApiUserService(ApiUserDao apiUserDao, PasswordEncoder passwordEnc, RequestDataParserService dataParser) {
 		this.apiUserDao = apiUserDao;
 		this.passwordEnc = passwordEnc;
+		this.dataParser = dataParser;
 	}
 	
 	public String loginUserAndGetAccountKey(String username, String rawPassword) throws InvalidCredentialsCustEx, InvalidUserAccountKeyCustEx {
@@ -33,7 +36,7 @@ public class ApiUserService {
 	}
 	
 	public ApiUser getCurrentUser(String authorizationHeader) throws InvalidUserAccountKeyCustEx {
-		String parsedKey = this.parseAccountKeyFromHeader(authorizationHeader)
+		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 										.orElseThrow(InvalidUserAccountKeyCustEx::new);
 
 		if ( !this.isAccountKeyValid(parsedKey) ) { throw new InvalidUserAccountKeyCustEx(); }
@@ -42,14 +45,6 @@ public class ApiUserService {
 						.orElseThrow();
 	}
 	
-	public List<String> getApiKeysFromAccountKey(String authorizationHeader) throws InvalidUserAccountKeyCustEx{
-		String parsedKey = this.parseAccountKeyFromHeader(authorizationHeader)
-				.orElseThrow(InvalidUserAccountKeyCustEx::new);
-		if (!this.isAccountKeyValid(parsedKey)) { throw new InvalidUserAccountKeyCustEx(); }
-		
-		return this.apiUserDao.getApiKeysFromAccountKey(parsedKey);
-		
-	}
 	
 	
 	
@@ -58,14 +53,6 @@ public class ApiUserService {
 	//Private methods
 	private boolean isAccountKeyValid(String accountKey) {
 		return this.apiUserDao.isAccountKeyValid(accountKey);
-	}
-	
-	private Optional<String> parseAccountKeyFromHeader(String authorizationHeader) {
-		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) { return Optional.empty(); }
-		
-		
-		return Optional.of(authorizationHeader.substring(7));
-		
 	}
 	
 
