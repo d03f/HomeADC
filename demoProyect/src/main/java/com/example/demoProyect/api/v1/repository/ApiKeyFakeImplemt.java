@@ -44,7 +44,7 @@ public class ApiKeyFakeImplemt implements ApiKeyDao {
 	}
 
 	@Override
-	public boolean insertAPiKey(ApiKey createdApiKey) {
+	public boolean insertApiKey(ApiKey createdApiKey) {
 		return true;
 	}
 	

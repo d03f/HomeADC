@@ -69,7 +69,7 @@ public class ApiKeyService {
 		
 		
 		
-		if ( !this.apiKeyDao.insertAPiKey(createdApiKey) ) { throw new InvalidDataCustEx(); } 
+		if ( !this.apiKeyDao.insertApiKey(createdApiKey) ) { throw new InvalidDataCustEx(); } 
 		return createdApiKey;
 	}
 	

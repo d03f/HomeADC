@@ -1,14 +1,22 @@
 package com.example.demoProyect.api.v1.service;
 
+import java.nio.file.AccessDeniedException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demoProyect.api.v1.controller.exceptions.AccessDeniedCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidCredentialsCustEx;
+import com.example.demoProyect.api.v1.controller.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.model.ApiUser;
+import com.example.demoProyect.api.v1.model.UserRole;
 import com.example.demoProyect.api.v1.repository.ApiUserDao;
 
 @Service
@@ -38,7 +46,6 @@ public class ApiUserService {
 	public ApiUser getCurrentUser(String authorizationHeader) throws InvalidUserAccountKeyCustEx {
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 										.orElseThrow(InvalidUserAccountKeyCustEx::new);
-
 		if ( !this.isAccountKeyValid(parsedKey) ) { throw new InvalidUserAccountKeyCustEx(); }
 				
 		return this.apiUserDao.getApiUserFromAccountKey(parsedKey)
@@ -47,13 +54,58 @@ public class ApiUserService {
 	
 	
 	
-	
+	public ApiUser createNewUser(String authorizationHeader, Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx {
+		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
+				.orElseThrow(InvalidUserAccountKeyCustEx::new);
+		if ( !this.isAccountKeyValid(parsedKey) ) { throw new InvalidUserAccountKeyCustEx(); }
+		
+		ApiUser creatorUser = this.getCurrentUser(authorizationHeader);
+		if( !creatorUser.isHasAdmin() ) { throw new AccessDeniedCustEx(); }
+		
+		ApiUser createdUser = this.createNewUser(requestBody, creatorUser.getRole());
+		
+		if (!this.apiUserDao.insertApiUser(createdUser)) { throw new InvalidParameterException(); }
+		
+		return createdUser;
+		
+		
+		
+		
+	}
 	
 	
 	//Private methods
+	private ApiUser createNewUser(Map<String, String> requestBody, UserRole creatorRole) throws InvalidDataCustEx, AccessDeniedCustEx {
+		ApiUser createdUser = new ApiUser();
+		
+		createdUser.setUserName( requestBody.get("username") );
+		createdUser.setPassword( this.passwordEnc.encode( requestBody.get("password") ) );
+		createdUser.setHasAdmin( Boolean.parseBoolean( requestBody.getOrDefault("isAdmin", "false") ) );
+		
+		createdUser.setAccountEnabled( Boolean.parseBoolean( requestBody.getOrDefault("accountEnabled", "true") ) );
+		createdUser.setCreationDate(LocalDateTime.now());
+		createdUser.setLastActivity(LocalDateTime.now());
+		
+		createdUser.setApiKeys(new ArrayList<>());
+		createdUser.setUserAccountKey( this.generateRandomUserAccountKey()  );
+		
+		try {
+			UserRole requestedRole = UserRole.valueOf( requestBody.get("role") );
+			if (!creatorRole.equals( UserRole.EDITOR ) && !creatorRole.equals(requestedRole) ) { throw new AccessDeniedCustEx(); }
+			createdUser.setRole( requestedRole );
+		} catch (InvalidParameterException e) { throw new InvalidDataCustEx(); } 
+		
+		return createdUser;
+	}
+	
 	private boolean isAccountKeyValid(String accountKey) {
 		return this.apiUserDao.isAccountKeyValid(accountKey);
 	}
 	
+	
+	private String generateRandomUserAccountKey() {
+		return java.util.UUID.randomUUID().toString().replace("-", "");
+		
+	}
 
 }

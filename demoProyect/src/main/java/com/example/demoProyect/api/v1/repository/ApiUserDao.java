@@ -15,5 +15,7 @@ public interface ApiUserDao {
 	public Optional<String> getUserAccountKey(String searchUserName);
 	
 	public Optional<ApiUser> getApiUserFromAccountKey(String userAcountKey);
+	
+	public boolean insertApiUser(ApiUser createdApiUser);
 
 }

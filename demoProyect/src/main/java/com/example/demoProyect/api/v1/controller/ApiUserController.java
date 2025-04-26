@@ -56,6 +56,17 @@ public class ApiUserController {
 		}
 	}
 	
+	
+	
+	@PostMapping("/createuser")
+	public ResponseEntity<?> createNewUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData){
+		try {
+			return CustomResponseOk.build(
+					this.apiUserService.createNewUser(authorizationHeader, requestData)
+				);
+		} catch ( CustomException e) { return CustomResponseError.build(e.getMessage()); }
+		
+	}
 
 	
 	

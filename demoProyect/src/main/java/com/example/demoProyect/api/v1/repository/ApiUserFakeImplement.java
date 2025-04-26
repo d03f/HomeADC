@@ -37,7 +37,7 @@ public class ApiUserFakeImplement implements ApiUserDao {
 		return Optional.of(  new ApiUser(
 				"paswd", "username", 
 				userAcountKey, UserRole.EDITOR, 
-				false, true, 
+				true, true, 
 				LocalDateTime.now(),
 				LocalDateTime.now(), 
 				new java.util.ArrayList<>() )
@@ -58,6 +58,12 @@ public class ApiUserFakeImplement implements ApiUserDao {
 	@Override
 	public Optional<String> getUserAccountKey(String searchUserName) {
 		return Optional.of("userAccountKeyexamplelalsdkfj");
+	}
+
+
+	@Override
+	public boolean insertApiUser(ApiUser createdApiUser) {
+		return true;
 	}
 
 

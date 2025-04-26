@@ -4,7 +4,7 @@ public abstract class CustomException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	
-	protected CustomException(String msg) {
+	public CustomException(String msg) {
 		super(msg);
 	}
 }
