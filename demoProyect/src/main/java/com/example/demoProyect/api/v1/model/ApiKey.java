@@ -21,6 +21,7 @@ public class ApiKey {
 	private LocalDateTime lastActivity;
 	
 	
+	public ApiKey() {}
 	public ApiKey(String apiKeyValue, String name, ApiUser owner, UserRole access, boolean keyEnabled,
 			Optional<LocalDateTime> expirationDate, LocalDateTime creationDate, LocalDateTime lastActivity) {
 		
@@ -56,7 +57,7 @@ public class ApiKey {
 
 
 	public Optional<LocalDateTime> getExpirationDate() { return expirationDate; }
-	public void setExpirationDate(Optional<LocalDateTime> expirationDate) { this.expirationDate = expirationDate; }
+	public void setExpirationDate(LocalDateTime expirationDate) { this.expirationDate = Optional.of( expirationDate ); }
 
 
 	public LocalDateTime getCreationDate() { return creationDate; }

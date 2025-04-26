@@ -40,8 +40,12 @@ public class ApiKeyFakeImplemt implements ApiKeyDao {
 
 	@Override
 	public Optional<String[]> getApiKeysValuesFromAccountKey(String accountKey) {
-		// TODO Auto-generated method stub
 		return Optional.of( new String[] {this.exampleKeys.get(0).getApiKeyValue(), this.exampleKeys.get(1).getApiKeyValue()} );
+	}
+
+	@Override
+	public boolean insertAPiKey(ApiKey createdApiKey) {
+		return true;
 	}
 	
 

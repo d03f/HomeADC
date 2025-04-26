@@ -14,6 +14,8 @@ public interface ApiKeyDao {
 	public Optional<ApiKey> getApiKeyInfo(String apiKey);
 	
 	public Optional<String[]> getApiKeysValuesFromAccountKey(String accountKey);
+	
+	public boolean insertAPiKey(ApiKey createdApiKey);
 
 
 }

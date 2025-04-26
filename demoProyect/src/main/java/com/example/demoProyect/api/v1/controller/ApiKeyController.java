@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demoProyect.api.v1.controller.exceptions.CustomException;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseError;
@@ -21,6 +22,10 @@ import com.example.demoProyect.api.v1.service.ApiKeyService;
 @RequestMapping("/api/v1/users/me/apikey")
 public class ApiKeyController {
 	
+	
+	public static final String VERIFICATION_KEY_FIELDNAME = "verificationKey";
+	
+	
 	private final ApiKeyService apiKeyService;
 	
 	public ApiKeyController(ApiKeyService apiKeyService) {
@@ -30,7 +35,7 @@ public class ApiKeyController {
 	
 	
 	@GetMapping
-	public ResponseEntity<?> getApiKeysOfCurrentUser( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
+	public ResponseEntity<?> getApiKeysOfCurrentUser( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader ){
 		try {
 			return CustomResponseOk.build( 
 					this.apiKeyService.getApiKeysFromAccountKey(authorizationHeader) 
@@ -42,15 +47,28 @@ public class ApiKeyController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> getApiKeyInfo( @RequestBody Map<String, String> requestData){
-		System.out.println("hola");
+	public ResponseEntity<?> getApiKeyInfo( @RequestBody Map<String, String> requestData ){
 		try {
 			return CustomResponseOk.build( 
-					this.apiKeyService.getApiKeyInfo(requestData.get("key"))
+					this.apiKeyService.getApiKeyInfo(requestData.get(VERIFICATION_KEY_FIELDNAME))
 				);
 		} catch ( InvalidApiKeyCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
 		}
+		
+	}
+	
+	@GetMapping("/generate")
+	public ResponseEntity<?> generateApiKey ( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData){
+		try {
+			return CustomResponseOk.build(
+					this.apiKeyService.generateApiKey(authorizationHeader, requestData)		
+				);
+		} catch (CustomException e) {
+			return CustomResponseError.build( e.getMessage() );
+		}
+		
+		
 		
 	}
 	
