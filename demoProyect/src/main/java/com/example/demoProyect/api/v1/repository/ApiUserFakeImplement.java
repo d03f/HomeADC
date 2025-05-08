@@ -23,14 +23,7 @@ public class ApiUserFakeImplement  {
 	
 
 	public Optional<ApiUser> getApiUserFromAccountKey(String userAcountKey) {
-		return Optional.of(  new ApiUser(
-				"paswd", "username", 
-				userAcountKey, UserRole.EDITOR, 
-				true, true, 
-				LocalDateTime.now(),
-				LocalDateTime.now(), 
-				new java.util.ArrayList<>() )
-			);
+		return Optional.empty();
 	}
 
 

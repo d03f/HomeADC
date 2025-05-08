@@ -40,8 +40,9 @@ public class ApiUserService {
 		this.dataParser = dataParser;
 	}
 	
+	@Transactional
 	public String loginUserAndGetAccountKey(String username, String rawPassword) throws InvalidCredentialsCustEx, InvalidUserAccountKeyCustEx {
-		ApiUser requestUser = this.apiUserRepo.findUserByUsernameWithQuery(username).orElseThrow( InvalidUserAccountKeyCustEx::new );
+		ApiUser requestUser = this.apiUserRepo.findUserByUsernameWithQuery(username).orElseThrow( InvalidCredentialsCustEx::new );
 		String storedHashPassword = requestUser.getPassword();
 		
 		if ( !this.passwordEnc.matches( rawPassword, storedHashPassword ) ) { throw new InvalidCredentialsCustEx(); }
@@ -61,7 +62,7 @@ public class ApiUserService {
 	}
 	
 	
-	
+	@Transactional
 	public ApiUser createNewUser(String authorizationHeader, Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx {
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 				.orElseThrow(InvalidUserAccountKeyCustEx::new);
@@ -114,6 +115,18 @@ public class ApiUserService {
 	private String generateRandomUserAccountKey() {
 		return java.util.UUID.randomUUID().toString().replace("-", "");
 		
+	}
+	
+	
+	
+	//OTHERS
+	@Transactional
+	public void createAdminUser() {
+		if (this.apiUserRepo.findUserByUsernameWithQuery("admin").isEmpty()) {
+			ApiUser newAdmin = new ApiUser(this.passwordEnc.encode( "admin" ), "admin", UserRole.EDITOR, true, true, LocalDateTime.now(), LocalDateTime.now(), null);
+			apiUserRepo.save(newAdmin);
+			
+		}
 	}
 
 }

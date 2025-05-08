@@ -49,12 +49,11 @@ public class ApiUser {
 	
 	
 	public ApiUser() {}
-	public ApiUser(String password, String userName, String userAccountKey, UserRole role, boolean isAdmin,
+	public ApiUser(String password, String userName, UserRole role, boolean isAdmin,
 			boolean accountEnabled, LocalDateTime lastActivity, LocalDateTime creationDate, List<ApiKey> apiKeys) {
 		super();
 		this.password = password;
 		this.userName = userName;
-		this.userAccountKey = userAccountKey;
 		this.role = role;
 		this.hasAdmin = isAdmin;
 		this.accountEnabled = accountEnabled;
