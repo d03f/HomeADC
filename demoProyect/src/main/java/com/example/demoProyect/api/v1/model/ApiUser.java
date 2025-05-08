@@ -6,24 +6,44 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
 
 @JsonPropertyOrder({"userName", "role", "hasAdmin", "userAccountKey", "lastActivity", "creationDate", "accountEnabled"})
+@Entity
+@Table(name = "apiuser")
 public class ApiUser {
 	
-	private String userName;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String userAccountKey;
-	@JsonIgnore
+
+	@Column(nullable = false, unique = true)
+	private String userName;
+
+	@Column(nullable = false)
 	private String password;
 	
 	private UserRole role;
+	@Column(nullable = false)
 	private boolean hasAdmin;
-	
+	@Column(nullable = false)
 	private boolean accountEnabled; 
 	
+	@Column(nullable = false)
 	private LocalDateTime lastActivity;
+	@Column(nullable = false)
 	private LocalDateTime creationDate;
 	
-	@JsonIgnore
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<ApiKey> apiKeys;
 	
 	

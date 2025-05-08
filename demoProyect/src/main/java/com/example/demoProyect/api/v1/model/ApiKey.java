@@ -3,29 +3,52 @@ package com.example.demoProyect.api.v1.model;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "apikey")
 public class ApiKey {
 	
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String apiKeyValue;
+	@Column(nullable = false)
 	private String name;
-	@JsonIgnore
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "owner_id", nullable = false)
 	private ApiUser owner;
 	
+	@Enumerated(EnumType.STRING)
 	private UserRole access;
+	
+	@Column(nullable = false)
 	private boolean keyEnabled;
 	
-	private Optional<LocalDateTime> expirationDate;
+	@Column(nullable = true)
+	private LocalDateTime expirationDate;
 	
+	@Column(nullable = false)
 	private LocalDateTime creationDate;
+	@Column(nullable = false)
 	private LocalDateTime lastActivity;
 	
 	
 	public ApiKey() {}
-	public ApiKey(String apiKeyValue, String name, ApiUser owner, UserRole access, boolean keyEnabled,
-			Optional<LocalDateTime> expirationDate, LocalDateTime creationDate, LocalDateTime lastActivity) {
+	public ApiKey( String name, ApiUser owner, UserRole access, boolean keyEnabled,
+			LocalDateTime expirationDate, LocalDateTime creationDate, LocalDateTime lastActivity) {
 		
-		this.apiKeyValue = apiKeyValue;
 		this.name = name;
 		this.owner = owner;
 		this.access = access;
@@ -56,8 +79,8 @@ public class ApiKey {
 	public void setKeyEnabled(boolean keyEnabled) { this.keyEnabled = keyEnabled; }
 
 
-	public Optional<LocalDateTime> getExpirationDate() { return expirationDate; }
-	public void setExpirationDate(LocalDateTime expirationDate) { this.expirationDate = Optional.of( expirationDate ); }
+	public LocalDateTime getExpirationDate() { return expirationDate; }
+	public void setExpirationDate(LocalDateTime expirationDate) { this.expirationDate = expirationDate; }
 
 
 	public LocalDateTime getCreationDate() { return creationDate; }

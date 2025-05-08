@@ -12,27 +12,16 @@ import com.example.demoProyect.api.v1.model.UserRole;
 
 
 @Repository
-public class ApiUserFakeImplement implements ApiUserDao {
+public class ApiUserFakeImplement  {
 	
 	
-	private final List<ApiKey> exampleKeys = java.util.List.of(
-			new ApiKey("apikey1adfjkasldfkjaklsfj", "apiKey1",
-					null, UserRole.READER,
-					true, null, 
-					LocalDateTime.now(), LocalDateTime.now()),
+	private final List<ApiKey> exampleKeys = java.util.List.of();
 	
-			new ApiKey("apikey2asdfasdfasfeasdfa", "apiKey2",
-					null, UserRole.WRITER,
-					true, Optional.of(LocalDateTime.now().plusDays(10L)), 
-					LocalDateTime.now(), LocalDateTime.now()));
-	
-	@Override
 	public boolean isAccountKeyValid(String accountKey) {
 		return !"error".equals(accountKey);
 	}
 	
 
-	@Override
 	public Optional<ApiUser> getApiUserFromAccountKey(String userAcountKey) {
 		return Optional.of(  new ApiUser(
 				"paswd", "username", 
@@ -46,7 +35,6 @@ public class ApiUserFakeImplement implements ApiUserDao {
 
 
 
-	@Override
 	public Optional<String> getPasswordOfUsername(String searchUsername) {
 		//Always return the hashed password "test" exceptn when username equals "error"
 		return "error".equals(searchUsername) ? Optional.empty() : Optional.of("$2a$10$nZF8GQ1ka8J9mRx4nAgeHOzGQUr4VfDUvzzIFuNy5ASctji31qyqu");
@@ -55,13 +43,11 @@ public class ApiUserFakeImplement implements ApiUserDao {
 
 
 
-	@Override
 	public Optional<String> getUserAccountKey(String searchUserName) {
 		return Optional.of("userAccountKeyexamplelalsdkfj");
 	}
 
 
-	@Override
 	public boolean insertApiUser(ApiUser createdApiUser) {
 		return true;
 	}

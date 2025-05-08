@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
@@ -23,11 +24,10 @@ import com.example.demoProyect.api.v1.service.ApiUserService;
 public class ApiUserController {
 	
 	private final ApiUserService apiUserService;
-
+	
 	public ApiUserController(ApiUserService apiUserService) {
 		this.apiUserService = apiUserService;
 	}
-	
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> getAccountKeyOfUserPasswd(@RequestBody Map<String, String> requestData) {
@@ -36,8 +36,7 @@ public class ApiUserController {
 		
 		try {
 			return CustomResponseOk.build( 
-					java.util.Map.of("userAccountKey", this.apiUserService.loginUserAndGetAccountKey(username, password) )
-									
+					java.util.Map.of("userAccountKey", this.apiUserService.loginUserAndGetAccountKey(username, password) )			
 				);
 		} catch (CustomException e) {
 			return CustomResponseError.build( e.getMessage() );

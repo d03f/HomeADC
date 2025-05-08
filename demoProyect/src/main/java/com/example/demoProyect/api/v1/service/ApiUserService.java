@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,38 +18,45 @@ import com.example.demoProyect.api.v1.controller.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.model.ApiUser;
 import com.example.demoProyect.api.v1.model.UserRole;
-import com.example.demoProyect.api.v1.repository.ApiUserDao;
+import com.example.demoProyect.api.v1.repository.ApiKeyRepo;
+import com.example.demoProyect.api.v1.repository.ApiUserRepo;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class ApiUserService {
 	
-	private final ApiUserDao apiUserDao;
+	private final ApiUserRepo apiUserRepo;
 	private final PasswordEncoder passwordEnc;
 	
 	private final RequestDataParserService dataParser;
 	
-	public ApiUserService(ApiUserDao apiUserDao, PasswordEncoder passwordEnc, RequestDataParserService dataParser) {
-		this.apiUserDao = apiUserDao;
+
+
+	
+	public ApiUserService(ApiUserRepo apiUserDao, PasswordEncoder passwordEnc, RequestDataParserService dataParser) {
+		this.apiUserRepo = apiUserDao;
 		this.passwordEnc = passwordEnc;
 		this.dataParser = dataParser;
 	}
 	
 	public String loginUserAndGetAccountKey(String username, String rawPassword) throws InvalidCredentialsCustEx, InvalidUserAccountKeyCustEx {
-		String storedHashPassword = this.apiUserDao.getPasswordOfUsername(username)
-											.orElseThrow( InvalidUserAccountKeyCustEx::new );
+		ApiUser requestUser = this.apiUserRepo.findUserByUsernameWithQuery(username).orElseThrow( InvalidUserAccountKeyCustEx::new );
+		String storedHashPassword = requestUser.getPassword();
 		
 		if ( !this.passwordEnc.matches( rawPassword, storedHashPassword ) ) { throw new InvalidCredentialsCustEx(); }
 		
-		return this.apiUserDao.getUserAccountKey(username)
-						.orElseThrow( InvalidUserAccountKeyCustEx::new );
+		return requestUser.getUserAccountKey();
 	}
 	
+	@Transactional
 	public ApiUser getCurrentUser(String authorizationHeader) throws InvalidUserAccountKeyCustEx {
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 										.orElseThrow(InvalidUserAccountKeyCustEx::new);
 		if ( !this.isAccountKeyValid(parsedKey) ) { throw new InvalidUserAccountKeyCustEx(); }
+
 				
-		return this.apiUserDao.getApiUserFromAccountKey(parsedKey)
+		return this.apiUserRepo.findById(parsedKey)
 						.orElseThrow();
 	}
 	
@@ -64,7 +72,7 @@ public class ApiUserService {
 		
 		ApiUser createdUser = this.createNewUser(requestBody, creatorUser.getRole());
 		
-		if (!this.apiUserDao.insertApiUser(createdUser)) { throw new InvalidParameterException(); }
+		this.apiUserRepo.save(createdUser);
 		
 		return createdUser;
 		
@@ -99,7 +107,7 @@ public class ApiUserService {
 	}
 	
 	private boolean isAccountKeyValid(String accountKey) {
-		return this.apiUserDao.isAccountKeyValid(accountKey);
+		return this.apiUserRepo.findById(accountKey).isPresent();
 	}
 	
 	
