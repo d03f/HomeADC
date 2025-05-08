@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
+import com.example.demoProyect.api.v1.controller.exceptions.AccessDeniedCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
@@ -58,7 +59,7 @@ public class ApiKeyService {
 	
 	
 	@Transactional
-	public ApiKeyDTO generateApiKey(String authorizationHeader,  Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx{
+	public ApiKeyDTO generateApiKey(String authorizationHeader,  Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx{
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 				.orElseThrow(InvalidUserAccountKeyCustEx::new);
 		if (!this.apiUserRepo.existsByUserAccountKeyAndAccountEnabledTrue(parsedKey)) { throw new InvalidUserAccountKeyCustEx(); }
@@ -79,7 +80,10 @@ public class ApiKeyService {
 		String expirationDate = requestBody.getOrDefault("expirationDate", null);
 		if (expirationDate != null) { createdApiKey.setExpirationDate(   LocalDateTime.parse(expirationDate, DATE_TIME_FORMAT)   );}
 		
-		try { createdApiKey.setAccess( UserRole.valueOf( requestBody.get("access") ) );
+		try { 
+			createdApiKey.setAccess( UserRole.valueOf( requestBody.get("access") ) );
+			if (!createdApiKey.getAccess().equals(owner.getRole()) && !owner.getRole().equals(UserRole.EDITOR)){ throw new AccessDeniedCustEx(); }
+			
 		} catch (IllegalArgumentException e) { throw new InvalidDataCustEx(); }
 
 		this.apiKeyRepo.save(createdApiKey);

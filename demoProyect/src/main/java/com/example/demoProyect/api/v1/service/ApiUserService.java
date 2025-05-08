@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demoProyect.api.v1.controller.exceptions.AccessDeniedCustEx;
+import com.example.demoProyect.api.v1.controller.exceptions.DuplicatedEntryCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidCredentialsCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
@@ -64,24 +65,22 @@ public class ApiUserService {
 	
 	
 	@Transactional
-	public ApiUserDTO createNewUser(String authorizationHeader, Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx {
+	public ApiUserDTO createNewUser(String authorizationHeader, Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx, DuplicatedEntryCustEx {
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 				.orElseThrow(InvalidUserAccountKeyCustEx::new);
 		if ( !this.isAccountKeyValid(parsedKey) ) { throw new InvalidUserAccountKeyCustEx(); }
+		if (!this.apiUserRepo.findUserByUsernameWithQuery(requestBody.get("username")).isEmpty()  ) { throw new DuplicatedEntryCustEx();}
+		
 		
 		ApiUser creatorUser = this.apiUserRepo.findById(parsedKey).orElseThrow();
+		
 		
 		if( !creatorUser.isHasAdmin() ) { throw new AccessDeniedCustEx(); }
 		
 		ApiUser createdUser = this.createNewUser(requestBody, creatorUser.getRole());
-		
 		this.apiUserRepo.save(createdUser);
 		
 		return new ApiUserDTO( createdUser );
-		
-		
-		
-		
 	}
 	
 	
