@@ -7,11 +7,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.example.demoProyect.api.v1.service.ApiUserService;
 
 
 @EnableRetry
+@EnableScheduling
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class DemoProyectApplication {
 	
@@ -21,9 +23,9 @@ public class DemoProyectApplication {
 	}
 
 	@Bean
-    CommandLineRunner run(ApiUserService userService, @Value("${admin.create-on-startup:false}") boolean createAdmin,
-    		@Value("${admin.default-username}") String username,
-    		@Value("${admin.default-password}") String password) {
+    CommandLineRunner run(ApiUserService userService, @Value("${app.admin.create-on-startup:false}") boolean createAdmin,
+    		@Value("${app.admin.default-username}") String username,
+    		@Value("${app.admin.default-password}") String password) {
 		
         return args -> {
             if (createAdmin) {

@@ -11,7 +11,7 @@ public class CustomResponseOk<T> implements CustomResponse {
 	private final T data;
 	
 	public CustomResponseOk(T data) {
-		this.status = "sucess";
+		this.status = "success";
 		this.data = data;	
 	}
 

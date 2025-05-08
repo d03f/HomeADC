@@ -61,13 +61,13 @@ public class ApiKeyService {
 	}
 	
 	@Transactional
-	public ApiKey getApiKeyInfo(String apiKey) throws InvalidApiKeyCustEx {
-		return this.apiKeyRepo.findById(apiKey).orElseThrow(() -> new InvalidApiKeyCustEx() );
+	public ApiKeyDTO getApiKeyInfo(String apiKey) throws InvalidApiKeyCustEx {
+		return new ApiKeyDTO(
+				this.apiKeyRepo.findById(apiKey).orElseThrow(() -> new InvalidApiKeyCustEx() ) );
 	}
 	
 	
 	@Transactional
-	@Retryable( maxAttempts = 3 )
 	public ApiKeyDTO generateApiKey(String authorizationHeader,  Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx{
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 				.orElseThrow(InvalidUserAccountKeyCustEx::new);
@@ -77,7 +77,7 @@ public class ApiKeyService {
 		
 		ApiKey createdApiKey = new ApiKey();
 		
-		ApiUser owner = this.apiUserRepo.findById(parsedKey).get();
+		ApiUser owner = this.apiUserRepo.findById(parsedKey).orElseThrow();
 		createdApiKey.setOwner( owner );
 		
 		createdApiKey.setName( requestBody.get("name") );

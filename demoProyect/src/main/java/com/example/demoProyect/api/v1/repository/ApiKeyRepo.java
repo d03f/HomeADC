@@ -1,5 +1,6 @@
 package com.example.demoProyect.api.v1.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,7 @@ import com.example.demoProyect.api.v1.model.ApiKey;
 public interface ApiKeyRepo  extends JpaRepository<ApiKey, String>{
 	@Query("SELECT ak.apiKeyValue FROM ApiKey ak WHERE ak.owner.userAccountKey = :userAccountKey")
 	List<String> findApiKeyValuesByOwnerUserAccountKey(@Param("userAccountKey") String userAccountKey);
+
+	List<ApiKey> findByExpirationDateLessThanEqual(LocalDateTime now);
 	
 }

@@ -16,6 +16,7 @@ import com.example.demoProyect.api.v1.controller.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseError;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseOk;
+import com.example.demoProyect.api.v1.service.ApiKeyCleanupService;
 import com.example.demoProyect.api.v1.service.ApiKeyService;
 
 @RestController
@@ -27,9 +28,11 @@ public class ApiKeyController {
 	
 	
 	private final ApiKeyService apiKeyService;
+	public final ApiKeyCleanupService apiKeyCleanupService;
 	
-	public ApiKeyController(ApiKeyService apiKeyService) {
+	public ApiKeyController(ApiKeyService apiKeyService, ApiKeyCleanupService apiKeyCleanupService) {
 		this.apiKeyService = apiKeyService;
+		this.apiKeyCleanupService = apiKeyCleanupService;
 	}
 
 	
@@ -70,6 +73,13 @@ public class ApiKeyController {
 		
 		
 		
+	}
+	
+	
+	@GetMapping("cleanup")
+	public ResponseEntity<?> cleanUpKeys(){
+		this.apiKeyCleanupService.removeExpiredApiKeys();
+		return CustomResponseOk.build( "Cleaned all the outdated apiKeys!" );
 	}
 	
 }
