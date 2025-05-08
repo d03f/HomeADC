@@ -4,14 +4,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import org.hibernate.StaleObjectStateException;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import com.example.demoProyect.api.v1.controller.ApiKeyController;
-import com.example.demoProyect.api.v1.controller.exceptions.CustomException;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
@@ -22,7 +16,6 @@ import com.example.demoProyect.api.v1.model.dto.ApiKeyDTO;
 import com.example.demoProyect.api.v1.repository.ApiKeyRepo;
 import com.example.demoProyect.api.v1.repository.ApiUserRepo;
 
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -35,10 +28,8 @@ public class ApiKeyService {
 	private final ApiUserRepo apiUserRepo;
 	private final RequestDataParserService dataParser;
 	
-	private final EntityManager entityManager;
-	
-	public ApiKeyService(ApiKeyRepo apiKeyRepo, ApiUserRepo apiUserDao, RequestDataParserService dataParser, EntityManager entityManager) {
-		this.entityManager = entityManager; this.apiKeyRepo = apiKeyRepo; this.apiUserRepo = apiUserDao;  this.dataParser = dataParser; 
+	public ApiKeyService(ApiKeyRepo apiKeyRepo, ApiUserRepo apiUserDao, RequestDataParserService dataParser) {
+		this.apiKeyRepo = apiKeyRepo; this.apiUserRepo = apiUserDao;  this.dataParser = dataParser; 
 	}
 	
 	@Transactional
@@ -48,7 +39,6 @@ public class ApiKeyService {
 		
 		if (!this.apiUserRepo.existsByUserAccountKeyAndAccountEnabledTrue(parsedKey)) { throw new InvalidUserAccountKeyCustEx(); }
 		
-		System.out.println("ljkasdfjklaksljdfjlkas\n\n\n\n");
 		
 		List<String> apiKeyValues = this.apiKeyRepo.findApiKeyValuesByOwnerUserAccountKey(parsedKey);
 		
@@ -91,20 +81,19 @@ public class ApiKeyService {
 		
 		try { createdApiKey.setAccess( UserRole.valueOf( requestBody.get("access") ) );
 		} catch (IllegalArgumentException e) { throw new InvalidDataCustEx(); }
-		
-	
-		
 
 		this.apiKeyRepo.save(createdApiKey);
 		return new ApiKeyDTO(createdApiKey);
 	}
 	
-	
-
-	private String generateRandomApiKeyValue() {
-		return java.util.UUID.randomUUID().toString().replace("-", "");
+	@Transactional
+	public ApiKeyDTO deleteApiKey(String apiKey) throws InvalidApiKeyCustEx {
+		ApiKey toBeDeleted = this.apiKeyRepo.findById(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+		this.apiKeyRepo.delete(toBeDeleted);
 		
+		return new ApiKeyDTO(toBeDeleted);
 	}
-	
+
+
 
 }

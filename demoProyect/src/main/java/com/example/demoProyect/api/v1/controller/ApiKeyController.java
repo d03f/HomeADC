@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demoProyect.api.v1.controller.exceptions.CustomException;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidApiKeyCustEx;
+import com.example.demoProyect.api.v1.controller.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseError;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseOk;
@@ -52,18 +53,20 @@ public class ApiKeyController {
 	@PostMapping
 	public ResponseEntity<?> getApiKeyInfo( @RequestBody Map<String, String> requestData ){
 		try {
+			if (!requestData.containsKey(VERIFICATION_KEY_FIELDNAME)) { throw new InvalidDataCustEx(); }
 			return CustomResponseOk.build( 
 					this.apiKeyService.getApiKeyInfo(requestData.get(VERIFICATION_KEY_FIELDNAME))
 				);
-		} catch ( InvalidApiKeyCustEx e) {
+		} catch ( InvalidApiKeyCustEx | InvalidDataCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
 		}
 		
 	}
 	
-	@GetMapping("/generate")
+	@PostMapping("/generate")
 	public ResponseEntity<?> generateApiKey ( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData){
 		try {
+			
 			return CustomResponseOk.build(
 					this.apiKeyService.generateApiKey(authorizationHeader, requestData)		
 				);
@@ -75,8 +78,21 @@ public class ApiKeyController {
 		
 	}
 	
+	@PostMapping("/remove")
+	public ResponseEntity<?> deleteApiKey ( @RequestBody Map<String, String> requestData){
+		try {
+			if (!requestData.containsKey(VERIFICATION_KEY_FIELDNAME)) { throw new InvalidDataCustEx(); }
+			return CustomResponseOk.build(
+					this.apiKeyService.deleteApiKey(requestData.get(VERIFICATION_KEY_FIELDNAME))		
+				);
+		} catch (CustomException e) {
+			return CustomResponseError.build( e.getMessage() );
+		}
+		
+		
+	}
 	
-	@GetMapping("cleanup")
+	@GetMapping("/cleanup")
 	public ResponseEntity<?> cleanUpKeys(){
 		this.apiKeyCleanupService.removeExpiredApiKeys();
 		return CustomResponseOk.build( "Cleaned all the outdated apiKeys!" );
