@@ -81,14 +81,7 @@ public class ApiKeyService {
 	}
 	
 	
-	
-	
-	private Optional<String> getApiKeyFromBody(Map<String, String> requestBody ){
-		return Optional.of( requestBody.get(ApiKeyController.VERIFICATION_KEY_FIELDNAME) );
-		
-	}
 
-	
 	private String generateRandomApiKeyValue() {
 		return java.util.UUID.randomUUID().toString().replace("-", "");
 		

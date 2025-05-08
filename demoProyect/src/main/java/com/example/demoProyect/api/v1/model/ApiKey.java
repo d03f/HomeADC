@@ -1,8 +1,6 @@
 package com.example.demoProyect.api.v1.model;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

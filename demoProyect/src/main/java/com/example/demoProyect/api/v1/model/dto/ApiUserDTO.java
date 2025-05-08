@@ -40,5 +40,72 @@ public class ApiUserDTO {
 		this.creationDate = apiUserData.getCreationDate();
 		this.apiKeys = apiUserData.getApiKeys();
 	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getUserAccountKey() {
+		return userAccountKey;
+	}
+
+	public void setUserAccountKey(String userAccountKey) {
+		this.userAccountKey = userAccountKey;
+	}
+
+	public UserRole getRole() {
+		return role;
+	}
+
+	public void setRole(UserRole role) {
+		this.role = role;
+	}
+
+	public boolean isHasAdmin() {
+		return hasAdmin;
+	}
+
+	public void setHasAdmin(boolean hasAdmin) {
+		this.hasAdmin = hasAdmin;
+	}
+
+	public boolean isAccountEnabled() {
+		return accountEnabled;
+	}
+
+	public void setAccountEnabled(boolean accountEnabled) {
+		this.accountEnabled = accountEnabled;
+	}
+
+	public LocalDateTime getLastActivity() {
+		return lastActivity;
+	}
+
+	public void setLastActivity(LocalDateTime lastActivity) {
+		this.lastActivity = lastActivity;
+	}
+
+	public LocalDateTime getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(LocalDateTime creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public List<ApiKey> getApiKeys() {
+		return apiKeys;
+	}
+
+	public void setApiKeys(List<ApiKey> apiKeys) {
+		this.apiKeys = apiKeys;
+	}
+	
+	
+	
 	
 }

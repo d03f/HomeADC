@@ -1,8 +1,6 @@
 package com.example.demoProyect.api.v1.model.dto;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-
 import com.example.demoProyect.api.v1.model.ApiKey;
 import com.example.demoProyect.api.v1.model.ApiUser;
 import com.example.demoProyect.api.v1.model.UserRole;
