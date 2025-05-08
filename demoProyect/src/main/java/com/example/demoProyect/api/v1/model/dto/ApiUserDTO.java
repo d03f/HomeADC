@@ -4,13 +4,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demoProyect.api.v1.model.ApiKey;
+import com.example.demoProyect.api.v1.model.ApiUser;
 import com.example.demoProyect.api.v1.model.UserRole;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+
+@JsonPropertyOrder({"userName", "role", "hasAdmin", "userAccountKey", "lastActivity", "creationDate", "accountEnabled"})
 public class ApiUserDTO {
 
 	private String userName;
 	private String userAccountKey;
-	private String password;
 	
 	private UserRole role;
 	private boolean hasAdmin;
@@ -25,18 +28,17 @@ public class ApiUserDTO {
 	
 	
 	public ApiUserDTO() {}
-	public ApiUserDTO(String password, String userName, String userAccountKey, UserRole role, boolean isAdmin,
-			boolean accountEnabled, LocalDateTime lastActivity, LocalDateTime creationDate, List<ApiKey> apiKeys) {
+	
+	public ApiUserDTO(ApiUser apiUserData) {
 		super();
-		this.password = password;
-		this.userName = userName;
-		this.userAccountKey = userAccountKey;
-		this.role = role;
-		this.hasAdmin = isAdmin;
-		this.accountEnabled = accountEnabled;
-		this.lastActivity = lastActivity;
-		this.creationDate = creationDate;
-		this.apiKeys = apiKeys;
+		this.userName = apiUserData.getUserName();
+		this.userAccountKey = apiUserData.getUserAccountKey();
+		this.role = apiUserData.getRole();
+		this.hasAdmin = apiUserData.isHasAdmin();
+		this.accountEnabled = apiUserData.isAccountEnabled();
+		this.lastActivity = apiUserData.getLastActivity();
+		this.creationDate = apiUserData.getCreationDate();
+		this.apiKeys = apiUserData.getApiKeys();
 	}
 	
 }

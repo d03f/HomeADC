@@ -121,9 +121,9 @@ public class ApiUserService {
 	
 	//OTHERS
 	@Transactional
-	public void createAdminUser() {
-		if (this.apiUserRepo.findUserByUsernameWithQuery("admin").isEmpty()) {
-			ApiUser newAdmin = new ApiUser(this.passwordEnc.encode( "admin" ), "admin", UserRole.EDITOR, true, true, LocalDateTime.now(), LocalDateTime.now(), null);
+	public void createAdminUser(String username, String password) {
+		if (this.apiUserRepo.findUserByUsernameWithQuery(username).isEmpty()) {
+			ApiUser newAdmin = new ApiUser(this.passwordEnc.encode( password ), username, UserRole.EDITOR, true, true, LocalDateTime.now(), LocalDateTime.now(), null);
 			apiUserRepo.save(newAdmin);
 			
 		}
