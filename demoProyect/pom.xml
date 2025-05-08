@@ -58,6 +58,11 @@
 	    <artifactId>mysql-connector-j</artifactId>
 	    <scope>runtime</scope>
 	</dependency>
+	
+	<dependency>
+	    <groupId>org.springframework.retry</groupId>
+	    <artifactId>spring-retry</artifactId>
+	</dependency>
 
 
 	

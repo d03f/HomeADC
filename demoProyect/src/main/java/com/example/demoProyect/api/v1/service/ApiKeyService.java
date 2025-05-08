@@ -6,16 +6,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.StaleObjectStateException;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import com.example.demoProyect.api.v1.controller.ApiKeyController;
+import com.example.demoProyect.api.v1.controller.exceptions.CustomException;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.model.ApiKey;
+import com.example.demoProyect.api.v1.model.ApiUser;
 import com.example.demoProyect.api.v1.model.UserRole;
+import com.example.demoProyect.api.v1.model.dto.ApiKeyDTO;
 import com.example.demoProyect.api.v1.repository.ApiKeyRepo;
 import com.example.demoProyect.api.v1.repository.ApiUserRepo;
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ApiKeyService {
@@ -27,18 +35,20 @@ public class ApiKeyService {
 	private final ApiUserRepo apiUserRepo;
 	private final RequestDataParserService dataParser;
 	
-	public ApiKeyService(ApiKeyRepo apiKeyRepo, ApiUserRepo apiUserDao, RequestDataParserService dataParser) {
-		this.apiKeyRepo = apiKeyRepo;
-		this.apiUserRepo = apiUserDao;
-
-		this.dataParser = dataParser;
-		
+	private final EntityManager entityManager;
+	
+	public ApiKeyService(ApiKeyRepo apiKeyRepo, ApiUserRepo apiUserDao, RequestDataParserService dataParser, EntityManager entityManager) {
+		this.entityManager = entityManager; this.apiKeyRepo = apiKeyRepo; this.apiUserRepo = apiUserDao;  this.dataParser = dataParser; 
 	}
 	
+	@Transactional
 	public String[] getApiKeysFromAccountKey(String authorizationHeader) throws InvalidUserAccountKeyCustEx{
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 				.orElseThrow(InvalidUserAccountKeyCustEx::new);
+		
 		if (!this.apiUserRepo.existsByUserAccountKeyAndAccountEnabledTrue(parsedKey)) { throw new InvalidUserAccountKeyCustEx(); }
+		
+		System.out.println("ljkasdfjklaksljdfjlkas\n\n\n\n");
 		
 		List<String> apiKeyValues = this.apiKeyRepo.findApiKeyValuesByOwnerUserAccountKey(parsedKey);
 		
@@ -46,22 +56,30 @@ public class ApiKeyService {
 			return apiKeyValues.toArray(size -> new String[size]);
 		}
 		
-		throw new InvalidUserAccountKeyCustEx();
+		return new String[] {};
 		
 	}
 	
+	@Transactional
 	public ApiKey getApiKeyInfo(String apiKey) throws InvalidApiKeyCustEx {
 		return this.apiKeyRepo.findById(apiKey).orElseThrow(() -> new InvalidApiKeyCustEx() );
 	}
 	
-	public ApiKey generateApiKey(String authorizationHeader,  Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx{
+	
+	@Transactional
+	@Retryable( maxAttempts = 3 )
+	public ApiKeyDTO generateApiKey(String authorizationHeader,  Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx{
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 				.orElseThrow(InvalidUserAccountKeyCustEx::new);
 		if (!this.apiUserRepo.existsByUserAccountKeyAndAccountEnabledTrue(parsedKey)) { throw new InvalidUserAccountKeyCustEx(); }
 		
+		
+		
 		ApiKey createdApiKey = new ApiKey();
 		
-		createdApiKey.setApiKeyValue( this.generateRandomApiKeyValue() );
+		ApiUser owner = this.apiUserRepo.findById(parsedKey).get();
+		createdApiKey.setOwner( owner );
+		
 		createdApiKey.setName( requestBody.get("name") );
 		createdApiKey.setKeyEnabled( Boolean.parseBoolean( requestBody.getOrDefault("keyEnabled", "true                                      ") ) );
 
@@ -74,10 +92,11 @@ public class ApiKeyService {
 		try { createdApiKey.setAccess( UserRole.valueOf( requestBody.get("access") ) );
 		} catch (IllegalArgumentException e) { throw new InvalidDataCustEx(); }
 		
+	
 		
-		
+
 		this.apiKeyRepo.save(createdApiKey);
-		return createdApiKey;
+		return new ApiKeyDTO(createdApiKey);
 	}
 	
 	

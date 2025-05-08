@@ -6,6 +6,7 @@ import java.util.List;
 import com.example.demoProyect.api.v1.model.ApiKey;
 import com.example.demoProyect.api.v1.model.ApiUser;
 import com.example.demoProyect.api.v1.model.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
@@ -23,6 +24,7 @@ public class ApiUserDTO {
 	private LocalDateTime lastActivity;
 	private LocalDateTime creationDate;
 	
+	@JsonIgnore
 	private List<ApiKey> apiKeys;
 	
 	

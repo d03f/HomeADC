@@ -39,7 +39,7 @@ public class ApiUser {
 	@Column(nullable = false)
 	private LocalDateTime creationDate;
 	
-	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	private List<ApiKey> apiKeys;
 	
 	

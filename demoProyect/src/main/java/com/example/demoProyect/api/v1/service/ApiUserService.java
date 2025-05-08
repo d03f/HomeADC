@@ -18,6 +18,7 @@ import com.example.demoProyect.api.v1.controller.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.controller.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.model.ApiUser;
 import com.example.demoProyect.api.v1.model.UserRole;
+import com.example.demoProyect.api.v1.model.dto.ApiUserDTO;
 import com.example.demoProyect.api.v1.repository.ApiKeyRepo;
 import com.example.demoProyect.api.v1.repository.ApiUserRepo;
 
@@ -51,31 +52,32 @@ public class ApiUserService {
 	}
 	
 	@Transactional
-	public ApiUser getCurrentUser(String authorizationHeader) throws InvalidUserAccountKeyCustEx {
+	public ApiUserDTO getCurrentUser(String authorizationHeader) throws InvalidUserAccountKeyCustEx {
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 										.orElseThrow(InvalidUserAccountKeyCustEx::new);
 		if ( !this.isAccountKeyValid(parsedKey) ) { throw new InvalidUserAccountKeyCustEx(); }
 
 				
-		return this.apiUserRepo.findById(parsedKey)
-						.orElseThrow();
+		return new ApiUserDTO( this.apiUserRepo.findById(parsedKey)
+						.orElseThrow() );
 	}
 	
 	
 	@Transactional
-	public ApiUser createNewUser(String authorizationHeader, Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx {
+	public ApiUserDTO createNewUser(String authorizationHeader, Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx {
 		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
 				.orElseThrow(InvalidUserAccountKeyCustEx::new);
 		if ( !this.isAccountKeyValid(parsedKey) ) { throw new InvalidUserAccountKeyCustEx(); }
 		
-		ApiUser creatorUser = this.getCurrentUser(authorizationHeader);
+		ApiUser creatorUser = this.apiUserRepo.findById(parsedKey).orElseThrow();
+		
 		if( !creatorUser.isHasAdmin() ) { throw new AccessDeniedCustEx(); }
 		
 		ApiUser createdUser = this.createNewUser(requestBody, creatorUser.getRole());
 		
 		this.apiUserRepo.save(createdUser);
 		
-		return createdUser;
+		return new ApiUserDTO( createdUser );
 		
 		
 		
@@ -96,7 +98,6 @@ public class ApiUserService {
 		createdUser.setLastActivity(LocalDateTime.now());
 		
 		createdUser.setApiKeys(new ArrayList<>());
-		createdUser.setUserAccountKey( this.generateRandomUserAccountKey()  );
 		
 		try {
 			UserRole requestedRole = UserRole.valueOf( requestBody.get("role") );
@@ -112,10 +113,6 @@ public class ApiUserService {
 	}
 	
 	
-	private String generateRandomUserAccountKey() {
-		return java.util.UUID.randomUUID().toString().replace("-", "");
-		
-	}
 	
 	
 	
