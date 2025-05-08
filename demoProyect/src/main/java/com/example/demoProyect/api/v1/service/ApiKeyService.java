@@ -16,6 +16,7 @@ import com.example.demoProyect.api.v1.model.UserRole;
 import com.example.demoProyect.api.v1.model.dto.ApiKeyDTO;
 import com.example.demoProyect.api.v1.repository.ApiKeyRepo;
 import com.example.demoProyect.api.v1.repository.ApiUserRepo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 
@@ -96,6 +97,16 @@ public class ApiKeyService {
 		this.apiKeyRepo.delete(toBeDeleted);
 		
 		return new ApiKeyDTO(toBeDeleted);
+	}
+
+	public ApiKeyDTO updateApiKey(String apiKey, String newName) throws InvalidApiKeyCustEx {
+		ApiKey toBeChanged = this.apiKeyRepo.findById(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+		
+		toBeChanged.setName(newName);
+		
+		this.apiKeyRepo.save(toBeChanged);
+		
+		return new ApiKeyDTO( toBeChanged );
 	}
 
 

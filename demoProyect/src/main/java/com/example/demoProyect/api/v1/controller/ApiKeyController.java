@@ -25,7 +25,7 @@ import com.example.demoProyect.api.v1.service.ApiKeyService;
 public class ApiKeyController {
 	
 	
-	public static final String VERIFICATION_KEY_FIELDNAME = "verificationKey";
+	public static final String VERIFICATION_KEY_FIELDNAME = "apiKeyValue";
 	
 	
 	private final ApiKeyService apiKeyService;
@@ -77,6 +77,8 @@ public class ApiKeyController {
 		
 		
 	}
+	
+	
 	
 	@PostMapping("/remove")
 	public ResponseEntity<?> deleteApiKey ( @RequestBody Map<String, String> requestData){
