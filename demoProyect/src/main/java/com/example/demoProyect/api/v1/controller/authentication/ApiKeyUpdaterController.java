@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseError;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseOk;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.CustomException;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.InvalidDataCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.CustomException;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.service.authentication.keys.ApiKeyUpdateService;
 
 @RestController

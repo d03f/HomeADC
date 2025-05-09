@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service;
 import com.example.demoProyect.api.v1.model.authentication.ApiUser;
 import com.example.demoProyect.api.v1.model.authentication.UserRole;
 import com.example.demoProyect.api.v1.model.authentication.dto.ApiUserDTO;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.AccessDeniedCustEx;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.DuplicatedEntryCustEx;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.InvalidCredentialsCustEx;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.InvalidDataCustEx;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.InvalidUserAccountKeyCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.AccessDeniedCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.DuplicatedEntryCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidCredentialsCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidDataCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.repository.authentication.ApiUserRepo;
-import com.example.demoProyect.api.v1.service.authentication.RequestDataParserService;
+import com.example.demoProyect.api.v1.service.RequestDataParserService;
 
 import jakarta.transaction.Transactional;
 
@@ -102,15 +102,19 @@ public class ApiUserService {
 		return createdUser;
 	}
 	
-	private boolean isAccountKeyValid(String accountKey) {
-		return this.apiUserRepo.findById(accountKey).isPresent();
-	}
+	
 	
 	
 	
 	
 	
 	//OTHERS
+	
+	@Transactional
+	public boolean isAccountKeyValid(String accountKey) {
+		return this.apiUserRepo.findById(accountKey).isPresent();
+	}
+	
 	@Transactional
 	public void createAdminUser(String username, String password) {
 		if (this.apiUserRepo.findUserByUsernameWithQuery(username).isEmpty()) {

@@ -10,13 +10,14 @@ import com.example.demoProyect.api.v1.model.authentication.ApiKey;
 import com.example.demoProyect.api.v1.model.authentication.ApiUser;
 import com.example.demoProyect.api.v1.model.authentication.UserRole;
 import com.example.demoProyect.api.v1.model.authentication.dto.ApiKeyDTO;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.AccessDeniedCustEx;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.InvalidApiKeyCustEx;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.InvalidDataCustEx;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.InvalidUserAccountKeyCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.AccessDeniedCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidApiKeyCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidDataCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.repository.authentication.ApiKeyRepo;
 import com.example.demoProyect.api.v1.repository.authentication.ApiUserRepo;
-import com.example.demoProyect.api.v1.service.authentication.RequestDataParserService;
+import com.example.demoProyect.api.v1.service.RequestDataParserService;
+
 import jakarta.transaction.Transactional;
 
 @Service

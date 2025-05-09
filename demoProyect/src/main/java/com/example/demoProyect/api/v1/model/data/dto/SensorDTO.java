@@ -1,9 +1,16 @@
 package com.example.demoProyect.api.v1.model.data.dto;
 
 import java.time.LocalDateTime;
-import com.example.demoProyect.api.v1.model.data.Sensor; 
+import com.example.demoProyect.api.v1.model.data.Sensor;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder; 
 
-
+@JsonPropertyOrder({
+	"sensorId", "name", 
+	"description", "location",
+	"dataUnit", "ownerUserId",
+	"ownerUserName", "creationDate",
+	"lastActivity", "allowedApiKeysCount",
+	"recordsCount"})
 public class SensorDTO {
 
     private String sensorId;

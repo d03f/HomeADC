@@ -1,4 +1,4 @@
-package com.example.demoProyect.api.v1.service.authentication;
+package com.example.demoProyect.api.v1.service;
 
 import java.util.Optional;
 

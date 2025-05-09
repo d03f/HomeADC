@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demoProyect.api.v1.model.authentication.ApiKey;
 import com.example.demoProyect.api.v1.model.authentication.dto.ApiKeyDTO;
-import com.example.demoProyect.api.v1.model.authentication.exceptions.InvalidApiKeyCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.repository.authentication.ApiKeyRepo;
 
 import jakarta.transaction.Transactional;

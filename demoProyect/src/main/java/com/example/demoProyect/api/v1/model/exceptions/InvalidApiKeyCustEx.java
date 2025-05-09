@@ -1,4 +1,4 @@
-package com.example.demoProyect.api.v1.model.authentication.exceptions;
+package com.example.demoProyect.api.v1.model.exceptions;
 
 public class InvalidApiKeyCustEx extends CustomException{
 
