@@ -1,10 +1,11 @@
 package com.example.demoProyect.api.v1.model.data.dto;
 
 import com.example.demoProyect.api.v1.model.data.DataUnit;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonPropertyOrder({"name", "symbol"})
 public class DataUnitDTO {
 
-    private String id;
     private String symbol;
     private String name;
 
@@ -12,7 +13,6 @@ public class DataUnitDTO {
     public DataUnitDTO() {}
     public DataUnitDTO(DataUnit dataUnit) {
         if (dataUnit != null) {
-            this.id = dataUnit.getId();
             this.symbol = dataUnit.getSymbol();
             this.name = dataUnit.getName();
         }
@@ -20,8 +20,6 @@ public class DataUnitDTO {
 
 
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
 
     public String getSymbol() { return symbol; }
     public void setSymbol(String symbol) { this.symbol = symbol; }
@@ -34,7 +32,6 @@ public class DataUnitDTO {
     @Override
     public String toString() {
         return "DataUnitDto{" +
-               "id='" + id + '\'' +
                ", symbol='" + symbol + '\'' +
                ", name='" + name + '\'' +
                '}';

@@ -19,9 +19,9 @@ public class DataUnit {
 	private String id;
 	
 	@Column(nullable = false, unique = true)
-	private String symbol;
+	private String symbol;	
 	
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String name;
 	
 	@OneToMany(mappedBy = "dataUnit")

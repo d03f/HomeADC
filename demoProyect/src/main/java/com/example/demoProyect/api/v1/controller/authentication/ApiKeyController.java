@@ -38,7 +38,7 @@ public class ApiKeyController {
 
 	
 	
-	@GetMapping("/info")
+	@GetMapping()
 	public ResponseEntity<?> getApiKeysOfCurrentUser( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader ){
 		try {
 			return CustomResponseOk.build( 
@@ -50,7 +50,7 @@ public class ApiKeyController {
 		
 	}
 	
-	@PostMapping("/info")
+	@PostMapping()
 	public ResponseEntity<?> getApiKeyInfo( @RequestBody Map<String, String> requestData ){
 		try {
 			if (!requestData.containsKey(VERIFICATION_KEY_FIELDNAME)) { throw new InvalidDataCustEx(); }
