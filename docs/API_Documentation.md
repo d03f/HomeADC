@@ -29,7 +29,6 @@ All responses from the API follow a consistent structure, indicating whether the
 	"data": {
 		"field1": "data1",
 		"field2": "data2"
-		//...
 	}
 }
 ```
@@ -105,10 +104,7 @@ All requests (except the initial login) require authentication using a **Bearer 
   ---
 
 ### Endpoint: `POST /api/v1/users/login`
-Allows users to authenticate and retrieve their `userAccountKey`.  
-
-**Purpose:** Login with your username and password to obtain your unique `userAccountKey`. This key is essential for authenticating subsequent requests.
-
+Login with your username and password to obtain your unique `userAccountKey`. This key is essential for authenticating subsequent requests.
 
 **Request Body (application/json):**
 
@@ -120,10 +116,6 @@ Allows users to authenticate and retrieve their `userAccountKey`.
 ```
 
 **Response (application/json):**
-
-
-
-  
 
 ```json
 
@@ -139,14 +131,10 @@ Allows users to authenticate and retrieve their `userAccountKey`.
 
 Retrieve the details of your authenticated user account.
 
- 
-
 **Headers:**
 
 ```http
-
 Authorization: Bearer your_user_account_key
-
 ```
 **Response (application/json):**
   
@@ -173,9 +161,7 @@ Create a new user account. The creator's account must have administrator privile
 **Headers:**
   
 ```http
-
 Authorization: Bearer your_user_account_key
-
 ```
 
   
@@ -189,20 +175,16 @@ Authorization: Bearer your_user_account_key
 	"username": "new_user_username",
 	"password": "new_user_password",
 	"role": "EDITOR",
-	"isAdmin": false, // Optional, default is false
-	"accountEnabled": true // Optional, default is true
+	"isAdmin": false,
+	"accountEnabled": true 
 }
 ```
-
-  
 
 * **`username`**: (String) Required. The username for the new account.
 * **`password`**: (String) Required. The password for the new account.
 * **`role`**: (String) Required. The role assigned to the new user .
 * **`isAdmin`**: (Boolean) Optional. Specifies if the new user is an administrator. Defaults to `false`.
 * **`accountEnabled`**: (Boolean) Optional. Specifies if the new account is enabled. Defaults to `true`.
-
-  
 
 **Response (application/json):**
 
@@ -246,8 +228,6 @@ Authorization: Bearer your_user_account_key
 ```
   
 **Response (application/json):**
-
-  
 
 ```json
 {
@@ -312,8 +292,8 @@ Authorization: Bearer your_user_account_key
 {
 	"name": "name_new_api_key",
 	"access": "access_level_new_api_key",
-	"expirationDate": "01-01-2000T23:59", // Optional, default = null
-	"keyEnabled": true // Optional, default = true
+	"expirationDate": "01-01-2000T23:59", 
+	"keyEnabled": true 
 
 }
 ```
@@ -469,8 +449,8 @@ Authorization: ApiKey your_api_key_value_here
 
 ```json
 {
-	"apiKeyValue": "api_key_to_search", // Required
-	"enable": true // Required (boolean: true to enable, false to disable)
+	"apiKeyValue": "api_key_to_search", 
+	"enable": true
 }
 ```
 
@@ -598,10 +578,10 @@ Authorization: ApiKey your_api_key_value_here
 {
 	"status": "success",
 	"data": [
-			{"name": "Celsius", "symbol": "ºC"},
-			{"name": "Humidity Percent", "symbol": "%"}
-		]
-	}
+		{"name": "Celsius", "symbol": "ºC"},
+		{"name": "Humidity Percent", "symbol": "%"}
+	]
+	
 }
 ```
 
@@ -693,7 +673,6 @@ Authorization: Bearer your_user_account_key
 			"allowedApiKeysCount": 0,
 			"recordsCount": 0
 		},
-		// ...
 	]
 }
 ```
@@ -710,7 +689,6 @@ Authorization: Bearer your_user_account_key
 ```http
 Authorization: Bearer your_user_account_key
 ```
-
 **Path Parameters:**
 * `name`: (String) Required. The name of the sensor to retrieve.
 
@@ -749,20 +727,16 @@ Authorization: Bearer your_user_account_key
 ```json
 {
 	"name": "new_sensor_name",
-	"description": "new_sensor_description", // Optional, default = null
-	"location": "where the sensor is located", // Optional, default = null 
-	"dataUnit": "Celsius" // Required (name or symbol of an existing DataUnit)
+	"description": "new_sensor_description", 
+	"location": "where the sensor is located",
+	"dataUnit": "Celsius" 
 }
 ```
-
-  
-
 * `name`: (String) Required. A unique name for the new sensor.
 * `description`: (String) Optional. A description for the sensor. Defaults to `null`.
 * `location`: (String) Optional. The physical location of the sensor. Defaults to `null`.
 * `dataUnit`: (String) Required. The name or symbol of an existing DataUnit that this sensor's records will use.
 
-  
 
 **Response (application/json):**
   
@@ -786,7 +760,7 @@ Authorization: Bearer your_user_account_key
   
 ---
 
-#### `DELETE /api/v1/sensors/me/{name}`
+### Endpoint: `DELETE /api/v1/sensors/me/{name}`
  Delete an existing sensor that you own.
 
 **Headers:**
@@ -833,7 +807,7 @@ Authorization: Bearer your_user_account_key
 
   
 
-### Endpoint:  `POST /api/v1/sensors/me/{name}/keys`
+### Endpoint: `POST /api/v1/sensors/me/{name}/keys`
 
  Add a specific API key to a sensor's allowed list. You can only add keys to sensors that you own. If the API key belongs to another user, you still use your `userAccountKey` for authorization.
 
@@ -861,9 +835,15 @@ Authorization: Bearer your_user_account_key
 ```json
 {
 	"status": "success",
-	"data": {
-		// ...
-	}
+	"data":  {
+		"apiKeyValue": "api_key_value",
+		"name": "api_key_name",
+		"access": "key_access_level",
+		"keyEnabled": true,
+		"expirationDate": "01-01-2000T23:59",
+		"creationDate": "01-01-2000T23:59",
+		"lastActivity": "01-01-2000T23:59"
+}	
 }
 
 ```
@@ -893,8 +873,14 @@ Authorization: Bearer your_user_account_key
 ```json
 {
 	"status": "success",
-	"data": {
-		// ...
+	"data":  {
+		"apiKeyValue": "api_key_value",
+		"name": "api_key_name",
+		"access": "key_access_level",
+		"keyEnabled": true,
+		"expirationDate": "01-01-2000T23:59",
+		"creationDate": "01-01-2000T23:59",
+		"lastActivity": "01-01-2000T23:59"
 	}
 }
 
@@ -932,7 +918,7 @@ Authorization: ApiKey your_api_key_value_here
 ```json
 {
 	"value": 1,
-	"metadata": "This is info about the report" // Optional 
+	"metadata": "This is info about the report"
 }
 ```
 * `value`: (Number) Required. The sensor reading value. Type should match the sensor's data unit (e.g., integer, decimal).
@@ -945,16 +931,15 @@ Authorization: ApiKey your_api_key_value_here
 {
 	"status": "success",
 	"data": {
-		"sensorRecordId": "******-***-****-****-**********", // Unique ID for the record
+		"sensorRecordId": "******-***-****-****-**********",
 		"value": 1,
-		"sensorId": "******-***-****-****-**********", // ID of the associated sensor
-		"timestamp": "01-01-2000T23:59", // Timestamp when the record was created/received
+		"sensorId": "******-***-****-****-**********",
+		"timestamp": "01-01-2000T23:59",
 		"metadata": "This is info about the report"
 	}
 }
 ```
-
-  
+---
 
 ### Endpoint: `GET /api/v1/records/{name}`
 Retrieve a list of records linked to a specific sensor, with extensive filtering, pagination, and sorting options.
@@ -983,13 +968,8 @@ Authorization: ApiKey your_api_key_value_here
 | `page`           | `2`                  | The specific page number to retrieve (0-indexed). |
 | `sort`           | `timestamp,desc`     | Sort the results by field(s). Format: `fieldName,direction`. Direction is `asc` or `desc`. Can be repeated for multi-field sort. |
 
-
-
-  
-
 **Response (application/json):**
   
-
 ```json
 {
 	"status": "success",
@@ -1004,7 +984,6 @@ Authorization: ApiKey your_api_key_value_here
 			"timestamp": "2000-01-01T23:59:58",
 			"metadata": "This is info about the report"
 		}
-		// ... more sensor record objects 
 	]
 }
 ```
@@ -1027,11 +1006,11 @@ Authorization: ApiKey your_api_key_value_here
 **Option Values:**
 
 
-| Option | Description                                         structure 
-| :----- | :-------------------------------------------------- |:--------------------------------- 
-| `min`  | Retrieve the record with the minimum value.        
-| `max`  | Retrieve the record with the maximum value.         
-| `avg`  | Get the average value of all records for the sensor.
+| Option | Description                                         |
+| :----- | :-------------------------------------------------- |
+| `min`  | Retrieve the record with the minimum value.         |
+| `max`  | Retrieve the record with the maximum value.         |
+| `avg`  | Get the average value of all records for the sensor.|
   
   
 
