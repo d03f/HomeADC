@@ -19,7 +19,7 @@ import com.example.demoProyect.api.v1.model.exceptions.InvalidUserAccountKeyCust
 import com.example.demoProyect.api.v1.service.authentication.users.ApiUserService;
 
 @RestController
-@RequestMapping("/api/v1/users/")
+@RequestMapping({"/api/v1/users/", "/api/v1/users"})
 public class ApiUserController {
 	
 	private final ApiUserService apiUserService;
@@ -56,7 +56,7 @@ public class ApiUserController {
 	
 	
 	
-	@PostMapping("/createuser")
+	@PostMapping
 	public ResponseEntity<?> createNewUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData){
 		try {
 			return CustomResponseOk.build(

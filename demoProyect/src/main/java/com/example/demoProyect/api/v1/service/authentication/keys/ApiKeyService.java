@@ -16,8 +16,6 @@ import com.example.demoProyect.api.v1.model.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.repository.authentication.ApiKeyRepo;
 import com.example.demoProyect.api.v1.repository.authentication.ApiUserRepo;
-import com.example.demoProyect.api.v1.service.RequestDataParserService;
-
 import jakarta.transaction.Transactional;
 
 @Service
@@ -28,16 +26,13 @@ public class ApiKeyService {
 	private final ApiKeyRepo apiKeyRepo;
 	
 	private final ApiUserRepo apiUserRepo;
-	private final RequestDataParserService dataParser;
-	
-	public ApiKeyService(ApiKeyRepo apiKeyRepo, ApiUserRepo apiUserDao, RequestDataParserService dataParser) {
-		this.apiKeyRepo = apiKeyRepo; this.apiUserRepo = apiUserDao;  this.dataParser = dataParser; 
+	public ApiKeyService(ApiKeyRepo apiKeyRepo, ApiUserRepo apiUserDao) {
+		this.apiKeyRepo = apiKeyRepo; this.apiUserRepo = apiUserDao; 
 	}
 	
 	@Transactional
-	public String[] getApiKeysFromAccountKey(String authorizationHeader) throws InvalidUserAccountKeyCustEx{
-		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
-				.orElseThrow(InvalidUserAccountKeyCustEx::new);
+	public String[] getApiKeysFromAccountKey(String parsedKey) throws InvalidUserAccountKeyCustEx{
+
 		if (!this.apiUserRepo.existsByUserAccountKeyAndAccountEnabledTrue(parsedKey)) { throw new InvalidUserAccountKeyCustEx(); }
 		
 		
@@ -57,9 +52,8 @@ public class ApiKeyService {
 	
 	
 	@Transactional
-	public ApiKeyDTO generateApiKey(String authorizationHeader,  Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx{
-		String parsedKey = this.dataParser.parseAccountKeyFromHeader(authorizationHeader)
-				.orElseThrow(InvalidUserAccountKeyCustEx::new);
+	public ApiKeyDTO generateApiKey(String parsedKey,  Map<String, String> requestBody) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx{
+
 		if (!this.apiUserRepo.existsByUserAccountKeyAndAccountEnabledTrue(parsedKey)) { throw new InvalidUserAccountKeyCustEx(); }
 		
 		

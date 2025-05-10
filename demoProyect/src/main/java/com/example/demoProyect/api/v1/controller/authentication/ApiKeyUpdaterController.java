@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseError;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseOk;
 import com.example.demoProyect.api.v1.model.exceptions.CustomException;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.service.RequestDataParserService;
@@ -33,11 +34,12 @@ public class ApiKeyUpdaterController {
 	}
 	
 	@PatchMapping("/name")
-	public ResponseEntity<?> udpateName( @RequestBody Map<String, String> requestData ){
+	public ResponseEntity<?> udpateName(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData ){
 		try {			
-			if (!requestData.containsKey(ApiKeyController.VERIFICATION_KEY_FIELDNAME)) { throw new InvalidDataCustEx(); }
 			return CustomResponseOk.build( 
-					this.apiKeyService.updateName(requestData.get(ApiKeyController.VERIFICATION_KEY_FIELDNAME), requestData.get("name"))
+					this.apiKeyService.updateName(
+							parserService.parseApiKeyFromHeader(authorizationHeader).orElseThrow(InvalidApiKeyCustEx::new),
+							requestData.get("name"))
 				);
 		} catch ( CustomException e) {
 			return CustomResponseError.build( e.getMessage() );
@@ -64,11 +66,12 @@ public class ApiKeyUpdaterController {
 	}
 	
 	@PatchMapping("/expirationdate")
-	public ResponseEntity<?> updateExpirDate( @RequestBody Map<String, String> requestData ){
+	public ResponseEntity<?> updateExpirDate(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData ){
 		try {			
-			if (!requestData.containsKey(ApiKeyController.VERIFICATION_KEY_FIELDNAME)) { throw new InvalidDataCustEx(); }
 			return CustomResponseOk.build( 
-					this.apiKeyService.updateExpirDate(requestData.get(ApiKeyController.VERIFICATION_KEY_FIELDNAME), LocalDateTime.parse( requestData.get("expirationDate") ))
+					this.apiKeyService.updateExpirDate(
+							this.parserService.parseApiKeyFromHeader(authorizationHeader).orElseThrow(InvalidApiKeyCustEx::new),
+							LocalDateTime.parse( requestData.get("expirationDate") ))
 				);
 		} catch ( CustomException e) {
 			return CustomResponseError.build( e.getMessage() );
