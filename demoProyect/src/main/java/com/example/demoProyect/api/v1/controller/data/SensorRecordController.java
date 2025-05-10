@@ -1,14 +1,20 @@
 package com.example.demoProyect.api.v1.controller.data;
 
+import org.springframework.data.domain.Pageable;
 import java.util.Map;
+import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseError;
@@ -28,6 +34,29 @@ public class SensorRecordController {
 	public SensorRecordController(SensorRecordService recordService, RequestDataParserService dataParser) {
 		this.recordService = recordService;
 		this.dataParser = dataParser;
+	}
+	
+	@GetMapping("/{name}")
+	public ResponseEntity<?> getRecords(
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+			@PathVariable String name,
+			@RequestParam(required = false) Optional<String> minValue,
+			@RequestParam(required = false) Optional<String> maxValue,
+			
+			@RequestParam(required = false) Optional<String> startDate,
+			@RequestParam(required = false) Optional<String> endDate,
+			
+			@RequestParam(required = false) Optional<String> metadataContains,
+			@PageableDefault(sort = "timestamp", direction = Sort.Direction.DESC) Pageable pageable
+			) {
+		try {
+			return CustomResponseOk.build(
+					this.recordService.getSensorRecord(
+					this.dataParser.parseApiKeyFromHeader(authorizationHeader).orElseThrow(InvalidApiKeyCustEx::new), name,
+					minValue, maxValue, startDate, endDate, metadataContains, pageable)
+				);
+		} catch (InvalidApiKeyCustEx | InvalidSensorCustEx e) { return CustomResponseError.build(e); }
+		
 	}
 	
 	@PostMapping("/{name}")
