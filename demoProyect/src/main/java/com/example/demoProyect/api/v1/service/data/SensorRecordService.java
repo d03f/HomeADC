@@ -105,4 +105,30 @@ public class SensorRecordService {
 		return new SensorRecordDTO(sensorRecord);
 	}
 
+	public SensorRecordDTO getMaxMinSensorRecord(String apiKey, String sensorName, String option) throws InvalidApiKeyCustEx, InvalidSensorCustEx, NullPointerException {
+		this.apiRepo.findByApiKeyValueAndKeyEnabledTrue(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+		
+		this.sensorRepo.findByName(sensorName).orElseThrow(InvalidSensorCustEx::new);
+		this.sensorRepo.findByNameAndAllowedApiKeys_ApiKeyValue(sensorName, apiKey).orElseThrow(InvalidSensorCustEx::new);
+		
+		SensorRecordDTO returnData = new SensorRecordDTO();
+		returnData.setTimestamp(LocalDateTime.now());
+		
+		if (option.equals("max")) {
+			returnData = new SensorRecordDTO( this.recordRepo.findTopBySensor_NameOrderByValueDesc(sensorName).orElseGet(null) );
+			returnData.setMetadata("This is the maximun value of all records");
+			
+		} else if (option.equals("min")) {
+			returnData = new SensorRecordDTO( this.recordRepo.findTopBySensor_NameOrderByValueAsc(sensorName).orElseGet(null) );
+			returnData.setMetadata("This is the minimum value of all records");
+			
+			
+		} else if (option.equals("avg")) {
+			returnData.setValue(  this.recordRepo.findAverageValueBySensorName(sensorName).orElseGet(null)  );
+			returnData.setMetadata("This is the average value of all the records");
+		}
+		
+		return returnData;
+	}
+
 }

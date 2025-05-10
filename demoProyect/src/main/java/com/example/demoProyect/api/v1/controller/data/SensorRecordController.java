@@ -59,6 +59,20 @@ public class SensorRecordController {
 		
 	}
 	
+	@GetMapping("/{name}/{option}")
+	public ResponseEntity<?> getRecords(
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+			@PathVariable String name, @PathVariable String option) {
+		try {
+			return CustomResponseOk.build(
+					this.recordService.getMaxMinSensorRecord(
+							this.dataParser.parseApiKeyFromHeader(authorizationHeader).orElseThrow(InvalidApiKeyCustEx::new), name, option)
+				);
+		} catch (InvalidApiKeyCustEx | InvalidSensorCustEx  e) { return CustomResponseError.build(e); }
+		catch (NullPointerException e) { return CustomResponseError.build(e.getMessage()); } 
+		
+	}
+	
 	@PostMapping("/{name}")
 	public ResponseEntity<?> postRecordOfSensor( 
 			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
