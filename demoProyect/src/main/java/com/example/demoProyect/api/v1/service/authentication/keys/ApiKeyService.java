@@ -32,12 +32,9 @@ public class ApiKeyService {
 	
 	@Transactional
 	public String[] getApiKeysFromAccountKey(String parsedKey) throws InvalidUserAccountKeyCustEx{
-
 		if (!this.apiUserRepo.existsByUserAccountKeyAndAccountEnabledTrue(parsedKey)) { throw new InvalidUserAccountKeyCustEx(); }
-		
-		
+				
 		List<String> apiKeyValues = this.apiKeyRepo.findApiKeyValuesByOwnerUserAccountKey(parsedKey);
-		
 		
 		if (!apiKeyValues.isEmpty()) { return apiKeyValues.toArray(size -> new String[size]); }
 		return new String[] {};

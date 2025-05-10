@@ -49,7 +49,7 @@ public class ApiKeyController {
 			Optional<String> bearerToken = this.dataParser.parseAccountKeyFromHeader(authorizationHeader);
 			Optional<String> apiToken = this.dataParser.parseApiKeyFromHeader(authorizationHeader);
 			if (bearerToken.isPresent()) {
-				return CustomResponseOk.build( this.apiKeyService.getApiKeysFromAccountKey(authorizationHeader)  );
+				return CustomResponseOk.build( this.apiKeyService.getApiKeysFromAccountKey(bearerToken.get())  );
 			} else if( apiToken.isPresent()) {
 				return CustomResponseOk.build(  this.apiKeyService.getApiKeyInfo(apiToken.get()) );
 			} else {
