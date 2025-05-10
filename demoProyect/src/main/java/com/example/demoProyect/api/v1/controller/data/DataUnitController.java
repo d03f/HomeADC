@@ -34,7 +34,7 @@ public class DataUnitController {
 	
 	@GetMapping
 	public ResponseEntity<?> getAllDataUnits(){
-		return CustomResponseOk.build( Map.of("dataUnits", this.dataUnitService.getAllDataUnits() ) );
+		return CustomResponseOk.build( this.dataUnitService.getAllDataUnits() );
 	}
 	
 	@PostMapping

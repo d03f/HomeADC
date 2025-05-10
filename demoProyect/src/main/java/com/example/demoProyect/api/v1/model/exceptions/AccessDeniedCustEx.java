@@ -5,7 +5,7 @@ public class AccessDeniedCustEx extends CustomException {
 	private static final long serialVersionUID = 1L;
 
 	public AccessDeniedCustEx() {
-		super("Your user cant do this action!");
+		super("Your user can't do this action!");
 	}
 	
 
