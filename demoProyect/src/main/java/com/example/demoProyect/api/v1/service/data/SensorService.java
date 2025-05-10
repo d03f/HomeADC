@@ -49,8 +49,11 @@ public class SensorService {
 	}
 
 	@Transactional
-	public SensorDTO createNewSensor(String authauthorizationToken, Map<String, String> requestData) throws InvalidUserAccountKeyCustEx, InvalidDataUnitCustEx, InvalidDataCustEx {
+	public SensorDTO createNewSensor(String authauthorizationToken, Map<String, String> requestData) throws InvalidUserAccountKeyCustEx, InvalidDataUnitCustEx, InvalidDataCustEx, DuplicatedEntryCustEx {
 		ApiUser creator = this.userRepo.findById(authauthorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		
+		if (this.sensorRepo.findByNameAndOwner(requestData.get("name"), creator).isPresent()) { throw new DuplicatedEntryCustEx(); }
+		
 		Sensor createdSensor = new Sensor();
 		
 		createdSensor.setOwner(creator);
@@ -72,7 +75,18 @@ public class SensorService {
 		return new SensorDTO( this.sensorRepo.save(createdSensor) );
 		
 	}
-
+	
+	@Transactional
+	public SensorDTO removeSensor(String authauthorizationToken, Map<String, String> requestData) throws InvalidUserAccountKeyCustEx, InvalidDataUnitCustEx, InvalidDataCustEx, DuplicatedEntryCustEx {
+		ApiUser creator = this.userRepo.findById(authauthorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		Sensor toBeDeleted = this.sensorRepo.findByNameAndOwner(requestData.get("name"), creator).orElseThrow(InvalidDataCustEx::new);
+		
+		this.sensorRepo.delete(toBeDeleted);
+		
+		return new SensorDTO( toBeDeleted );
+	
+	}
+	@Transactional
 	public SensorDTO getOneSensorOfUser(String authorizationToken, String searchName) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx {
 		ApiUser creator = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
 
@@ -81,24 +95,26 @@ public class SensorService {
 		);
 	}
 	
-	
+	@Transactional
 	public SensorDTO addNewApiKeyToSensor(String authorizationToken, String apiKeyToAdd, String nameOfSensor) 
 			throws InvalidUserAccountKeyCustEx, AccessDeniedCustEx, InvalidApiKeyCustEx, DuplicatedEntryCustEx {
+		
 		ApiUser ownerAndUser = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
 		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, ownerAndUser).orElseThrow(AccessDeniedCustEx::new);
+		
 		ApiKey apiKey = this.apiKeyRepo.findById(apiKeyToAdd).orElseThrow(InvalidApiKeyCustEx::new);
 		
 		if (toUpdateSensor.containsAllowedApikey(apiKey)) { throw new DuplicatedEntryCustEx(); }
 		
 		toUpdateSensor.addAllowedApiKey(apiKey);
-		
 		this.sensorRepo.save(toUpdateSensor);
 		
 		return new SensorDTO(toUpdateSensor);
 	}
 	
+	@Transactional
 	public SensorDTO addUsedApiKeyToSensor(String apiKeyValue, String nameOfSensor) 
-			throws InvalidUserAccountKeyCustEx, AccessDeniedCustEx, InvalidApiKeyCustEx, DuplicatedEntryCustEx {
+			throws AccessDeniedCustEx, InvalidApiKeyCustEx, DuplicatedEntryCustEx {
 		ApiKey apiKey = this.apiKeyRepo.findByApiKeyValueAndKeyEnabledTrue(apiKeyValue).orElseThrow(InvalidApiKeyCustEx::new);
 		ApiUser owner = apiKey.getOwner();
 		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, owner).orElseThrow(AccessDeniedCustEx::new);
@@ -106,6 +122,39 @@ public class SensorService {
 		if (toUpdateSensor.containsAllowedApikey(apiKey)) { throw new DuplicatedEntryCustEx(); }
 		
 		toUpdateSensor.addAllowedApiKey(apiKey);
+		this.sensorRepo.save(toUpdateSensor);
+		
+		return new SensorDTO(toUpdateSensor);
+	}
+	
+	
+	@Transactional
+	public SensorDTO removeNewApiKeyToSensor(String authorizationToken, String apiKeyToAdd, String nameOfSensor) 
+			throws InvalidUserAccountKeyCustEx, AccessDeniedCustEx, InvalidApiKeyCustEx, InvalidDataCustEx {
+		
+		ApiUser ownerAndUser = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, ownerAndUser).orElseThrow(AccessDeniedCustEx::new);
+		
+		ApiKey apiKey = this.apiKeyRepo.findById(apiKeyToAdd).orElseThrow(InvalidApiKeyCustEx::new);
+		
+		if (!toUpdateSensor.containsAllowedApikey(apiKey)) { throw new InvalidDataCustEx(); }
+		
+		toUpdateSensor.removeAllowedApiKey(apiKey);
+		this.sensorRepo.save(toUpdateSensor);
+		
+		return new SensorDTO(toUpdateSensor);
+	}
+	
+	@Transactional
+	public SensorDTO removeUsedApiKeyToSensor(String apiKeyValue, String nameOfSensor) 
+			throws AccessDeniedCustEx, InvalidApiKeyCustEx, InvalidDataCustEx {
+		ApiKey apiKey = this.apiKeyRepo.findByApiKeyValueAndKeyEnabledTrue(apiKeyValue).orElseThrow(InvalidApiKeyCustEx::new);
+		ApiUser owner = apiKey.getOwner();
+		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, owner).orElseThrow(AccessDeniedCustEx::new);
+		
+		if (!toUpdateSensor.containsAllowedApikey(apiKey)) { throw new InvalidDataCustEx(); }
+		
+		toUpdateSensor.removeAllowedApiKey(apiKey);
 		this.sensorRepo.save(toUpdateSensor);
 		
 		return new SensorDTO(toUpdateSensor);

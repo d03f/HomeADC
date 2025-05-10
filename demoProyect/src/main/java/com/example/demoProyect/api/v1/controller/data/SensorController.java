@@ -68,24 +68,53 @@ public class SensorController {
 					this.sensorService.createNewSensor(
 							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new), requestData
 						));
-		} catch ( InvalidUserAccountKeyCustEx | InvalidDataUnitCustEx | InvalidDataCustEx e) {
+		} catch ( InvalidUserAccountKeyCustEx | InvalidDataUnitCustEx | InvalidDataCustEx | DuplicatedEntryCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
 		}
 	}
 	
 	
+	@PostMapping("/me/remove")
+	public ResponseEntity<?> removeSensor(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData){
+		try {
+			return CustomResponseOk.build( 
+					this.sensorService.removeSensor(
+							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new), requestData
+						));
+		} catch ( InvalidUserAccountKeyCustEx | InvalidDataUnitCustEx | InvalidDataCustEx | DuplicatedEntryCustEx e) {
+			return CustomResponseError.build( e.getMessage() );
+		}
+	}
+	
 	@PostMapping("/me/addkey")
-	public ResponseEntity<?> addApiKeyToSensor(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData ){
+	public ResponseEntity<?> addApiKeyToSensor(@RequestHeader( required = false, value = "Authorization" ) String authorizationHeader, @RequestBody Map<String, String> requestData ){
 		Optional<String> accountKey = parserService.parseAccountKeyFromHeader(authorizationHeader);
 		
 		try {
 			Object toSend;
 			if (accountKey.isPresent()) { toSend = this.sensorService.addNewApiKeyToSensor(accountKey.get(), requestData.get("apiKeyValue"), requestData.get("name")); }
-			else { toSend = this.sensorService.addUsedApiKeyToSensor(requestData.get("apiKeyValue"), requestData.get("name")); }
+			else {  toSend = this.sensorService.addUsedApiKeyToSensor(requestData.get("apiKeyValue"), requestData.get("name")); }
 		
 			return CustomResponseOk.build(toSend);
 		} catch (InvalidUserAccountKeyCustEx | AccessDeniedCustEx | InvalidApiKeyCustEx | DuplicatedEntryCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
 		}
 	}
+	
+	@PostMapping("/me/removekey")
+	public ResponseEntity<?> removeApiKeyToSensor(@RequestHeader( required = false, value = "Authorization" ) String authorizationHeader, @RequestBody Map<String, String> requestData ){
+		Optional<String> accountKey = parserService.parseAccountKeyFromHeader(authorizationHeader);
+		
+		try {
+			Object toSend;
+			if (accountKey.isPresent()) { toSend = this.sensorService.removeNewApiKeyToSensor(accountKey.get(), requestData.get("apiKeyValue"), requestData.get("name")); }
+			else {  toSend = this.sensorService.removeUsedApiKeyToSensor(requestData.get("apiKeyValue"), requestData.get("name")); }
+		
+			return CustomResponseOk.build(toSend);
+		} catch (InvalidUserAccountKeyCustEx | AccessDeniedCustEx | InvalidApiKeyCustEx | InvalidDataCustEx e) {
+			return CustomResponseError.build( e.getMessage() );
+		}
+	}
+	
+	
 }
