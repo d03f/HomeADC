@@ -77,9 +77,9 @@ public class SensorService {
 	}
 	
 	@Transactional
-	public SensorDTO removeSensor(String authauthorizationToken, Map<String, String> requestData) throws InvalidUserAccountKeyCustEx, InvalidDataUnitCustEx, InvalidDataCustEx, DuplicatedEntryCustEx {
+	public SensorDTO removeSensor(String authauthorizationToken,String name) throws InvalidUserAccountKeyCustEx, InvalidDataUnitCustEx, InvalidDataCustEx, DuplicatedEntryCustEx {
 		ApiUser creator = this.userRepo.findById(authauthorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
-		Sensor toBeDeleted = this.sensorRepo.findByNameAndOwner(requestData.get("name"), creator).orElseThrow(InvalidDataCustEx::new);
+		Sensor toBeDeleted = this.sensorRepo.findByNameAndOwner(name, creator).orElseThrow(InvalidDataCustEx::new);
 		
 		this.sensorRepo.delete(toBeDeleted);
 		

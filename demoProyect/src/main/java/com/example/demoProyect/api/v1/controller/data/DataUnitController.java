@@ -37,7 +37,7 @@ public class DataUnitController {
 		return CustomResponseOk.build( Map.of("dataUnits", this.dataUnitService.getAllDataUnits() ) );
 	}
 	
-	@PostMapping("/generate")
+	@PostMapping
 	public ResponseEntity<?> createNewDataUnit(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData){
 		try {
 			return CustomResponseOk.build(  

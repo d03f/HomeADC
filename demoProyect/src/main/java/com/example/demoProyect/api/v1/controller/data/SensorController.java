@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -48,12 +50,12 @@ public class SensorController {
 		}
 	}
 	
-	@GetMapping("/me/info")
-	public ResponseEntity<?> getOneSensorOfUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData){
+	@GetMapping("/me/{value}")
+	public ResponseEntity<?> getOneSensorOfUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @PathVariable String value){
 		try {
 			return CustomResponseOk.build( 
 					this.sensorService.getOneSensorOfUser(
-							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new), requestData.get("name")
+							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new), value
 						));
 		} catch ( InvalidUserAccountKeyCustEx | InvalidDataCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
@@ -61,7 +63,7 @@ public class SensorController {
 	}
 	
 	
-	@PostMapping("/me/generate")
+	@PostMapping("/me")
 	public ResponseEntity<?> createNewSensor(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData){
 		try {
 			return CustomResponseOk.build( 
@@ -74,25 +76,27 @@ public class SensorController {
 	}
 	
 	
-	@PostMapping("/me/remove")
-	public ResponseEntity<?> removeSensor(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData){
+	@DeleteMapping("/me/{value}")
+	public ResponseEntity<?> removeSensor(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @PathVariable String value){
 		try {
 			return CustomResponseOk.build( 
 					this.sensorService.removeSensor(
-							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new), requestData
+							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new), value
 						));
 		} catch ( InvalidUserAccountKeyCustEx | InvalidDataUnitCustEx | InvalidDataCustEx | DuplicatedEntryCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
 		}
 	}
 	
-	@PostMapping("/me/addkey")
-	public ResponseEntity<?> addApiKeyToSensor(@RequestHeader( required = false, value = "Authorization" ) String authorizationHeader, @RequestBody Map<String, String> requestData ){
+	@PostMapping("/me/{name}/keys")
+	public ResponseEntity<?> addApiKeyToSensor(@RequestHeader( required = false, value = "Authorization" ) String authorizationHeader,
+			@PathVariable String name,
+			@RequestBody Map<String, String> requestData ){
 		Optional<String> accountKey = parserService.parseAccountKeyFromHeader(authorizationHeader);
 		
 		try {
 			Object toSend;
-			if (accountKey.isPresent()) { toSend = this.sensorService.addNewApiKeyToSensor(accountKey.get(), requestData.get("apiKeyValue"), requestData.get("name")); }
+			if (accountKey.isPresent()) { toSend = this.sensorService.addNewApiKeyToSensor(accountKey.get(), requestData.get("apiKeyValue"), name); }
 			else {  toSend = this.sensorService.addUsedApiKeyToSensor(requestData.get("apiKeyValue"), requestData.get("name")); }
 		
 			return CustomResponseOk.build(toSend);
@@ -101,14 +105,15 @@ public class SensorController {
 		}
 	}
 	
-	@PostMapping("/me/removekey")
-	public ResponseEntity<?> removeApiKeyToSensor(@RequestHeader( required = false, value = "Authorization" ) String authorizationHeader, @RequestBody Map<String, String> requestData ){
+	@DeleteMapping("/me/{name}/keys/{apikey}")
+	public ResponseEntity<?> removeApiKeyToSensor(@RequestHeader( required = false, value = "Authorization" ) String authorizationHeader, 
+			@PathVariable("name") String name, @PathVariable("apikey") String apiKey){
 		Optional<String> accountKey = parserService.parseAccountKeyFromHeader(authorizationHeader);
 		
 		try {
 			Object toSend;
-			if (accountKey.isPresent()) { toSend = this.sensorService.removeNewApiKeyToSensor(accountKey.get(), requestData.get("apiKeyValue"), requestData.get("name")); }
-			else {  toSend = this.sensorService.removeUsedApiKeyToSensor(requestData.get("apiKeyValue"), requestData.get("name")); }
+			if (accountKey.isPresent()) { toSend = this.sensorService.removeNewApiKeyToSensor(accountKey.get(), apiKey, name); }
+			else {  toSend = this.sensorService.removeUsedApiKeyToSensor(apiKey, name); }
 		
 			return CustomResponseOk.build(toSend);
 		} catch (InvalidUserAccountKeyCustEx | AccessDeniedCustEx | InvalidApiKeyCustEx | InvalidDataCustEx e) {
