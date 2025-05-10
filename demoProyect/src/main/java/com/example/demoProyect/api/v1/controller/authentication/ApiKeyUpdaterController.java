@@ -22,7 +22,7 @@ import com.example.demoProyect.api.v1.service.RequestDataParserService;
 import com.example.demoProyect.api.v1.service.authentication.keys.ApiKeyUpdateService;
 
 @RestController
-@RequestMapping("/api/v1/users/me/apikey/update")
+@RequestMapping("/api/v1/users/me/apikey")
 public class ApiKeyUpdaterController {
 	
 	private final ApiKeyUpdateService apiKeyService;

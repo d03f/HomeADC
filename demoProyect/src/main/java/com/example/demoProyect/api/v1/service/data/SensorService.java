@@ -99,7 +99,9 @@ public class SensorService {
 	public SensorDTO addNewApiKeyToSensor(String authorizationToken, String apiKeyToAdd, String nameOfSensor) 
 			throws InvalidUserAccountKeyCustEx, AccessDeniedCustEx, InvalidApiKeyCustEx, DuplicatedEntryCustEx {
 		
+		
 		ApiUser ownerAndUser = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		
 		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, ownerAndUser).orElseThrow(AccessDeniedCustEx::new);
 		
 		ApiKey apiKey = this.apiKeyRepo.findById(apiKeyToAdd).orElseThrow(InvalidApiKeyCustEx::new);

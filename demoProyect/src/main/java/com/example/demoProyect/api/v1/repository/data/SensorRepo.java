@@ -14,6 +14,11 @@ import com.example.demoProyect.api.v1.model.data.Sensor;
 public interface SensorRepo  extends JpaRepository<Sensor, String>{
 	
 	 List<Sensor> findByOwner(ApiUser owner);
+	 
+	 Optional<Sensor> findByName(String name);
+	 
 	 Optional<Sensor> findByNameAndOwner(String name, ApiUser owner);
+
+	 Optional<Sensor> findByNameAndAllowedApiKeys_ApiKeyValue(String name, String apiKeyValue);
 
 }
