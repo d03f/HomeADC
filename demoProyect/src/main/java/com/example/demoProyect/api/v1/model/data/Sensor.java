@@ -2,7 +2,9 @@ package com.example.demoProyect.api.v1.model.data;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.example.demoProyect.api.v1.model.authentication.ApiKey;
@@ -55,14 +57,14 @@ public class Sensor {
 	@JoinTable(name = "sensor_allowed_apikeys",
 				joinColumns = @JoinColumn(name = "sensor_id"),
 				inverseJoinColumns = @JoinColumn(name = "apikey_value") )
-	private List<ApiKey> allowedApiKeys;
+	private Set<ApiKey> allowedApiKeys;
 
 	@OneToMany(mappedBy = "sensor", cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Use CascadeType.ALL cautiously
     private List<SensorRecord> records;
 	
 	public Sensor() {}
 	public Sensor(String sensorId, String name, String description, String location, DataUnit dataUnit,
-			LocalDateTime creationDate, LocalDateTime lastActivity, ApiUser owner, List<ApiKey> allowedApiKeys, List<SensorRecord> records) {
+			LocalDateTime creationDate, LocalDateTime lastActivity, ApiUser owner, Set<ApiKey> allowedApiKeys, List<SensorRecord> records) {
 		super();
 		this.sensorId = sensorId;
 		this.name = name;
@@ -102,8 +104,8 @@ public class Sensor {
 	public ApiUser getOwner() {return owner; }
 	public void setOwner(ApiUser owner) {this.owner = owner; }
 	
-	public List<ApiKey> getAllowedApiKeys() {return allowedApiKeys; }
-	public void setAllowedApiKeys(List<ApiKey> allowedApiKeys) {this.allowedApiKeys = allowedApiKeys; }
+	public Set<ApiKey> getAllowedApiKeys() {return allowedApiKeys; }
+	public void setAllowedApiKeys(Set<ApiKey> allowedApiKeys) {this.allowedApiKeys = allowedApiKeys; }
 	
 	public List<SensorRecord> getRecords() {return this.records;}
 	
@@ -112,10 +114,20 @@ public class Sensor {
 		if (this.records == null) { this.records = new ArrayList<>(); }
 		this.records.add(newRecord); newRecord.setSensor(this);
 	}
-
 	public void removeRecord(SensorRecord record) {
 		if (this.records != null) { this.records.remove(record); record.setSensor(null); }
 	}
+	
+	
+	public boolean containsAllowedApikey(ApiKey apiKey) { return this.allowedApiKeys.contains(apiKey); }
+	public void addAllowedApiKey(ApiKey apiKey) { 
+		if (this.allowedApiKeys == null) { this.allowedApiKeys = new HashSet<>(); }
+		this.allowedApiKeys.add(apiKey);
+	}
+	public void removeAllowedApiKey(ApiKey apiKey) {
+		if (this.allowedApiKeys != null) { this.allowedApiKeys.remove(apiKey); }
+	}
+	
 
 	@Override
     public String toString() {
