@@ -1,0 +1,45 @@
+package com.example.demoProyect.api.v1.service.data;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import com.example.demoProyect.api.v1.model.data.DataUnit;
+import com.example.demoProyect.api.v1.model.data.dto.DataUnitDTO;
+import com.example.demoProyect.api.v1.model.exceptions.DuplicatedEntryCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidDataCustEx;
+import com.example.demoProyect.api.v1.model.exceptions.InvalidUserAccountKeyCustEx;
+import com.example.demoProyect.api.v1.repository.authentication.ApiUserRepo;
+import com.example.demoProyect.api.v1.repository.data.DataUnitRepo;
+
+@Service
+public class DataUnitService {
+
+	private DataUnitRepo dataUnitRepo;
+	private ApiUserRepo userRepo;
+	
+	public DataUnitService(DataUnitRepo dataUnitRepo, ApiUserRepo userRepo) {
+		this.dataUnitRepo = dataUnitRepo;
+		this.userRepo = userRepo;
+	}
+	
+	public DataUnitDTO createNewDataUnit(String authorizationToken,  Map<String, String> requestData) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, DuplicatedEntryCustEx {
+		this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		
+		DataUnit created = new DataUnit();
+		
+		String symbol = requestData.get("symbol"); 	created.setSymbol(symbol); 	if (symbol == null ) { throw new InvalidDataCustEx(); }
+		String name = requestData.get("name");		created.setName(name);		if (name == null) { throw new InvalidDataCustEx(); }
+		
+		if (this.dataUnitRepo.findByName(created.getName()).isPresent() || 
+				this.dataUnitRepo.findBySymbol(created.getSymbol()).isPresent()) { throw new DuplicatedEntryCustEx(); }
+		
+		return new DataUnitDTO( this.dataUnitRepo.save(created) );			
+	}
+
+	public List<DataUnitDTO> getAllDataUnits() {
+		return this.dataUnitRepo.findAll().stream().map(DataUnitDTO::new).toList();
+	}
+	
+}
