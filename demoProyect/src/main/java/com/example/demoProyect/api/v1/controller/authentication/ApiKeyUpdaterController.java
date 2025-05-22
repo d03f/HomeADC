@@ -50,6 +50,7 @@ public class ApiKeyUpdaterController {
 	
 	@PatchMapping("/enabled")
 	public ResponseEntity<?> updateEnabled(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Map<String, String> requestData ){
+		
 		try {			
 			if (!requestData.containsKey(ApiKeyController.VERIFICATION_KEY_FIELDNAME)) { throw new InvalidDataCustEx(); }
 			return CustomResponseOk.build( 
