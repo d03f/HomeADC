@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RequestDataParserService {
 	
-	private static final String API_KEY_SCHEME = "ApiKey "; // Define the expected prefix
+	private static final String API_KEY_SCHEME = "ApiKey ";
 	
 	public Optional<String> parseAccountKeyFromHeader(String authorizationHeader) {
 		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) { return Optional.empty(); }

@@ -20,5 +20,7 @@ public interface SensorRepo  extends JpaRepository<Sensor, String>{
 	 Optional<Sensor> findByNameAndOwner(String name, ApiUser owner);
 
 	 Optional<Sensor> findByNameAndAllowedApiKeys_ApiKeyValue(String name, String apiKeyValue);
+	 
+	 List<Sensor> findByAllowedApiKeys_ApiKeyValue(String apiKeyValue);
 
 }

@@ -1,7 +1,6 @@
 package com.example.demoProyect.api.v1.service.authentication.keys;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -10,24 +9,26 @@ import com.example.demoProyect.api.v1.model.authentication.ApiKey;
 import com.example.demoProyect.api.v1.model.authentication.ApiUser;
 import com.example.demoProyect.api.v1.model.authentication.UserRole;
 import com.example.demoProyect.api.v1.model.authentication.dto.ApiKeyDTO;
+import com.example.demoProyect.api.v1.model.data.Sensor;
 import com.example.demoProyect.api.v1.model.exceptions.AccessDeniedCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.repository.authentication.ApiKeyRepo;
 import com.example.demoProyect.api.v1.repository.authentication.ApiUserRepo;
+import com.example.demoProyect.api.v1.repository.data.SensorRepo;
+
 import jakarta.transaction.Transactional;
 
 @Service
 public class ApiKeyService {
-	
-	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-	
+		
 	private final ApiKeyRepo apiKeyRepo;
-	
+	private final SensorRepo sensorRepo;
 	private final ApiUserRepo apiUserRepo;
-	public ApiKeyService(ApiKeyRepo apiKeyRepo, ApiUserRepo apiUserDao) {
-		this.apiKeyRepo = apiKeyRepo; this.apiUserRepo = apiUserDao; 
+	
+	public ApiKeyService(ApiKeyRepo apiKeyRepo, ApiUserRepo apiUserDao, SensorRepo sensorRepo) {
+		this.apiKeyRepo = apiKeyRepo; this.apiUserRepo = apiUserDao; this.sensorRepo = sensorRepo; 
 	}
 	
 	@Transactional
@@ -68,7 +69,7 @@ public class ApiKeyService {
 		createdApiKey.setLastActivity( LocalDateTime.now() );
 		
 		String expirationDate = requestBody.getOrDefault("expirationDate", null);
-		if (expirationDate != null) { createdApiKey.setExpirationDate(   LocalDateTime.parse(expirationDate, DATE_TIME_FORMAT)   );}
+		if (expirationDate != null) { createdApiKey.setExpirationDate( LocalDateTime.parse( expirationDate ));}
 		
 		
 		try { 
@@ -86,6 +87,16 @@ public class ApiKeyService {
 	@Transactional
 	public ApiKeyDTO deleteApiKey(String apiKey) throws InvalidApiKeyCustEx {
 		ApiKey toBeDeleted = this.apiKeyRepo.findById(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+		
+		
+		List<Sensor> linkedSensors = this.sensorRepo.findByAllowedApiKeys_ApiKeyValue(apiKey);
+		
+		for (Sensor currSensor : linkedSensors) {
+			currSensor.removeAllowedApiKey(toBeDeleted);
+			this.sensorRepo.save(currSensor);
+		}
+		
+		
 		this.apiKeyRepo.delete(toBeDeleted);
 		
 		return new ApiKeyDTO(toBeDeleted);
