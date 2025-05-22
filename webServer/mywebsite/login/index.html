@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="../libraries/custom/config.js"></script>
+    <script src="../libraries/custom/storage.js"></script>
+    <script src="../libraries/requests/loginRequest.js"></script>
+
+
+</head>
+<body>
+
+    
+    <div class="custom-bg">
+        <div class="custom-bg-item"></div>
+        <div class="custom-bg-item"></div>
+        <div class="custom-bg-item"></div>
+        <div class="custom-bg-item"></div>
+        <div class="custom-bg-item"></div>
+
+    </div>
+
+    <div class="loginCard">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <input type="text" id="formUsername" placeholder="Username" required>
+            <input type="password" id="formPassword" placeholder="Password" required>
+            <button type="submit">Login</button>
+
+        </form>
+
+    </div>
+
+    <script src="/libraries/custom/others/bgManager.js"></script>
+    <script>
+        const dataStorage = new DataStorage(true)
+
+        document.getElementById("loginForm").addEventListener('submit', sendLogin);
+
+
+        function sendLogin(event){
+            event.preventDefault()
+
+            let username = document.getElementById("formUsername").value
+            let password = document.getElementById("formPassword").value
+
+            sendLoginRequest(username, password, dataStorage).then((result) => {
+                console.log(result)
+                if (result) { window.location.replace("../index.html")
+                } else {
+                    let username = document.getElementById("formUsername").classList.add("incorrectInput")
+                    let password = document.getElementById("formPassword").classList.add("incorrectInput")
+
+                } 
+                })
+            
+            
+        }
+
+
+    </script>
+</body>
+</html>

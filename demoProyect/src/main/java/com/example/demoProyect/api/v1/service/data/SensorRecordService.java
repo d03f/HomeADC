@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.example.demoProyect.api.v1.model.authentication.ApiKey;
 import com.example.demoProyect.api.v1.model.data.Sensor;
 import com.example.demoProyect.api.v1.model.data.SensorRecord;
 import com.example.demoProyect.api.v1.model.data.dto.SensorRecordDTO;
@@ -44,8 +45,8 @@ public class SensorRecordService {
 			Optional<String> startDate, Optional<String> endDate,
 			Optional<String> metadataContains, 
 			Pageable pageable ) throws InvalidApiKeyCustEx, InvalidSensorCustEx{
-		this.apiRepo.findByApiKeyValueAndKeyEnabledTrue(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
-		this.sensorRepo.findByName(sensorName).orElseThrow(InvalidSensorCustEx::new);
+		ApiKey usedApikey = this.apiRepo.findByApiKeyValueAndKeyEnabledTrue(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+		this.sensorRepo.findByNameAndAllowedApiKeys_ApiKeyValue(sensorName, usedApikey.getApiKeyValue()).orElseThrow(InvalidSensorCustEx::new);
 		
 		
 		Specification<SensorRecord> spec = this.createFilters(sensorName, minValue, maxValue, startDate, endDate, metadataContains);

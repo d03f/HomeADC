@@ -31,6 +31,7 @@ public class SensorService {
 	private ApiKeyRepo apiKeyRepo;
 	
 	private static final String DATA_UNIT_FIELD_NAME = "dataUnit";
+	private ApiUser stored;
 	
 	public SensorService(SensorRepo sensorRepo, ApiUserRepo userRepo, DataUnitRepo dataUnitRepo, ApiKeyRepo apiKeyRepo) {
 		this.sensorRepo = sensorRepo;
@@ -101,6 +102,8 @@ public class SensorService {
 		
 		
 		ApiUser ownerAndUser = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+
+		this.stored = ownerAndUser;
 		
 		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, ownerAndUser).orElseThrow(AccessDeniedCustEx::new);
 		
@@ -116,17 +119,11 @@ public class SensorService {
 	
 	@Transactional
 	public SensorDTO addUsedApiKeyToSensor(String apiKeyValue, String nameOfSensor) 
-			throws AccessDeniedCustEx, InvalidApiKeyCustEx, DuplicatedEntryCustEx {
+			throws AccessDeniedCustEx, InvalidApiKeyCustEx, DuplicatedEntryCustEx, InvalidUserAccountKeyCustEx {
 		ApiKey apiKey = this.apiKeyRepo.findByApiKeyValueAndKeyEnabledTrue(apiKeyValue).orElseThrow(InvalidApiKeyCustEx::new);
 		ApiUser owner = apiKey.getOwner();
-		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, owner).orElseThrow(AccessDeniedCustEx::new);
 		
-		if (toUpdateSensor.containsAllowedApikey(apiKey)) { throw new DuplicatedEntryCustEx(); }
-		
-		toUpdateSensor.addAllowedApiKey(apiKey);
-		this.sensorRepo.save(toUpdateSensor);
-		
-		return new SensorDTO(toUpdateSensor);
+		return this.addNewApiKeyToSensor(owner.getUserAccountKey(), apiKeyValue, nameOfSensor);
 	}
 	
 	

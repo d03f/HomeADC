@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+
+    <script  src="/libraries/custom/config.js"></script>
+    <script  src="/libraries/custom/storage.js"></script>
+    <script  src="/libraries/custom/checkAccountKey.js"></script>
+    
+    <script src="/libraries/requests/apikeys/getApiKeys.js"></script>
+    <script src="/libraries/requests/apikeys/getApiKeyData.js"></script>
+    <script src="/libraries/requests/getUserInfo.js"></script>
+    <script src="/libraries/requests/apikeys/getApiKeyInfo.js"></script>
+    <script src="/libraries/requests/apikeys/postApiKey.js"></script>
+    <script src="/libraries/requests/apikeys/updates/updateApiKeyMult.js"></script>
+    
+
+    
+    <script src="/libraries/chart.js"></script>
+    <script src="/libraries/custom/graphs/dateParsers.js"></script>
+    <script src="/libraries/custom/graphs/graphBuilder.js"></script>
+    <script src="/libraries/custom/graphs/graphManager.js"></script>
+    <script src="/libraries/custom/graphs/graphFiller.js"></script>
+    
+    
+    <script defer src="/libraries/custom/loaders/loadAllGraphs.js"></script>
+    
+    <script src="/libraries/bootstrap_offline.js" ></script>
+
+
+
+
+    
+</head>
+<body>
+
+
+
+  <div id="apikey-menu-placeholder"><script src="/libraries/custom/loaders/loadApiKeyMenu.js"></script></div>
+
+  <div class="navbar-bg">
+    <div id="navbar-placeholder">
+      <script src="/libraries/custom/loaders/loadNavbar.js"></script>
+    </div>
+  </div>
+
+
+    
+  
+  
+  
+  
+  <div class="custom-bg">
+    <div class="custom-bg-item"></div>
+    <div class="custom-bg-item"></div>
+    <div class="custom-bg-item"></div>
+    <div class="custom-bg-item"></div>
+    <div class="custom-bg-item"></div>
+    <div class="custom-bg-item"></div>
+    <div class="custom-bg-item"></div>
+    <div class="custom-bg-item"></div>
+  </div>
+  
+
+    
+    <div id="main-body" class="z-3">
+
+
+      <div class="graphs-container ">
+        
+        <div class="container w-100">
+        
+          <div class="graph-holder w-90 h-50 ">
+            <h1>Current User Info</h1>
+          </div>
+
+          <div class="row justify-content-center align-items-center">
+            <div class="col graph-holder w-90 h-50   d-flex flex-column align-items-center justify-content-center text-center">
+              
+              <h2 class="mb-5">User Info</h2>
+              
+              <div class="input-group mb-3 w-50"> <div class="input-group-prepend "> <span style="background-color: rgb(172, 172, 172);"class="input-group-text " id="basic-addon1">Username</span> </div> <input id="userName" disabled type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"></div>
+
+              <div class="input-group mb-3 w-50"><div class="input-group-prepend"> <span style="background-color: rgb(172, 172, 172);" class="input-group-text" id="basic-addon1">Role</span> </div><input id="role" disabled type="text" class="form-control" placeholder="Role"  aria-describedby="basic-addon1"></div>
+
+              <div class="input-group mb-3 w-50"><div class="input-group-prepend" > <span  style="background-color: rgb(172, 172, 172);" class="input-group-text" id="basic-addon1">Is Admin</span> </div><input id="isAdmin" disabled type="text" class="form-control" placeholder="true"  aria-describedby="basic-addon1"></div>
+
+              <div class="input-group mb-3 w-50"><div class="input-group-prepend" > <span style="background-color: rgb(172, 172, 172);" class="input-group-text" id="basic-addon1">Creation Date</span> </div><input disabled id="creationDate" type="date" class="form-control" placeholder="Role"  aria-describedby="basic-addon1"></div>
+
+              <script>
+                let parent = document.currentScript.parentElement
+                getUserInfoRequest(new DataStorage().getItem("accountKey")).then(data => {
+
+                  parent.querySelector("#userName").value = data.userName
+                  parent.querySelector("#role").value = data.role
+                  parent.querySelector("#isAdmin").value = data.hasAdmin
+                  parent.querySelector("#creationDate").value = data.creationDate.split("T")[0]
+
+                  
+
+                
+                })
+              </script>
+              
+
+              
+
+            </div>
+
+
+            <div class="col graph-holder w-90 h-50   d-flex flex-column align-items-center justify-content-center text-center">
+              <h2 class="mb-5">ApiKey Info</h2>
+              <div class="input-group mb-3 w-50"> <div class="input-group-prepend "> <span style="background-color: rgb(172, 172, 172);"class="input-group-text " id="basic-addon1">Name</span> </div> <input id="name" disabled type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"></div>
+              <div class="input-group mb-3 w-50"><div class="input-group-prepend"> <span style="background-color: rgb(172, 172, 172);" class="input-group-text" id="basic-addon1">Access</span> </div><input id="role" disabled type="text" class="form-control" placeholder="Role"  aria-describedby="basic-addon1"></div>
+              <div class="input-group mb-3 w-50"><div class="input-group-prepend" > <span  style="background-color: rgb(172, 172, 172);" class="input-group-text" id="basic-addon1">Expiration Date</span> </div><input id="expirDate" disabled type="date" class="form-control" placeholder="true"  aria-describedby="basic-addon1"></div>
+              <div class="input-group mb-3 w-50"><div class="input-group-prepend" > <span style="background-color: rgb(172, 172, 172);" class="input-group-text" id="basic-addon1">Creation Date</span> </div><input disabled id="creationDate" type="date" class="form-control" placeholder="Role"  aria-describedby="basic-addon1"></div>
+              <script>
+                let paret = document.currentScript.parentElement
+                getApiKeyInfoRequest(new DataStorage().getItem("apiKey")).then(data => {
+                  paret.querySelector("#name").value = data.name; paret.querySelector("#role").value = data.access; paret.querySelector("#creationDate").value = data.creationDate.split("T")[0]
+                  
+                  let expiraDate = paret.querySelector("#expirDate")
+
+                  if (!data.expirationDate){expiraDate.type = "text"; expiraDate.value = "null"}
+                  else{ expiraDate.value = data.expirationDate.split("T")[0] }
+                })
+              </script>
+            </div>
+
+            </div>
+
+  
+        </div>
+
+      </div>
+    
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <script src="init.js"></script>
+
+
+    <style>
+
+      .graphs-container{
+        position: relative;
+        height: 100%; width: 100%;
+        display: flexbox
+      }
+      
+
+      .graph-holder{ 
+        position: relative;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        color: white;
+        margin: 40px;
+      }
+
+      
+      
+      .graph{
+        border-radius: 20px;
+        background-color: transparent;
+        color: transparent;
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+
+
+      }
+
+      .modify-button{
+        position: absolute;
+        top: 10px; right: 10px;
+        text-align: center;
+        
+      }
+
+      
+
+    </style>
+
+  <style>
+
+    #main-body{
+      width: 100%; height: 100%; min-height: 100vh;
+      background-color: transparent;
+      z-index: 1;
+      position: relative;
+    }
+    
+    .custom-bg{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    z-index: -1;
+}
+
+    .custom-bg-item{
+        position: absolute;
+        height: 200px; width: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        filter: blur(30px);
+        pointer-events: none
+    }
+
+    @keyframes float0 {
+        0%, 100% { transform: translateY(0) translateX(0);
+        }
+        50% {transform: translateY(-200px) translateX(100px); }
+    }
+
+    @keyframes float1 {
+        0%, 100% {transform: translateY(0) translateX(0); }
+        50% { transform: translateY(200px) translateX(-100px); }
+    }
+    @keyframes float2 {
+        0%, 100% { transform: translateY(0) translateX(0); }
+        50% { transform: translateY(100px) translateX(-200px); }
+    }
+    @keyframes float3 {
+        0%, 100% { transform: translateY(0) translateX(0); }
+        50% { transform: translateY(-100px) translateX(200px); }
+    }
+
+  </style>
+  
+
+  
+  
+
+      
+    
+
+
+
+  <link rel="stylesheet" href="/libraries/bootstrap_offline.css">
+
+  <link rel="stylesheet" href="style.css">
+  
+  
+
+
+</body>
+</html>

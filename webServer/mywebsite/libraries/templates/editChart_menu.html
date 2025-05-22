@@ -1,0 +1,163 @@
+<div class="edit-menu">
+    <h1>Edit sensor</h1>
+    <div class="edit-menu-holder" style="display: block">
+
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Sensor Name</span>
+        <input type="text" class="form-control" placeholder="Name" id="input-sensor-name" >
+      </div>
+      
+      
+      <!-- Graph Type Selector -->
+      <div class="input-group" >
+        <span class="input-group-text">Graph Display Type</span>
+        <select class="form-select" aria-label="Graph type select" id="input-sensor-type">
+          <option value="line">Line</option>
+          <option value="bar">Bar</option>
+          <option value="radar">Radar</option>
+        </select>
+      </div>
+      
+      
+      <div class="d-flex justify-content-start align-items-center gap-3 flex-nowrap" style="margin-bottom: 1rem !important;margin-top: 1rem !important;">
+        
+        
+        <!-- Graph Background Color -->
+        <div class="input-group">
+          <span class="input-group-text">BG Color</span>
+          <input type="color" id="input-sensor-bgcolor" class="form-control form-control-color" id="bgColorPicker" value="#ffffff" title="Choose background color">
+          
+        </div>
+        
+      <!-- Graph Plot Color -->
+      <div class="input-group">
+        <span class="input-group-text">Plot Color</span>
+        <input type="color" id="input-sensor-color" class="form-control form-control-color" id="plotColorPicker" value="#563d7c" title="Choose plot color">
+      </div>
+      
+    </div>
+
+    
+    <div class="input-group" style="margin-bottom: 1rem !important;">
+      <span class="input-group-text">Filters</span>
+      <textarea class="form-control" id="input-sensor-filters" aria-label="With textarea" placeholder="sort=timestamp,desc&#10;size=100"></textarea>
+    </div>
+    
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="basic-addon1">Update Interval</span>
+      <input type="text" class="form-control" placeholder="Name" id="input-sensor-interval" >
+    </div>
+
+    <button button type="button" class="btn btn-secondary" onclick="setValuesUpdate(this)">Update</button>
+    
+    <script>
+
+      function setValuesUpdate(targetElem){
+
+        let formParent = targetElem.parentElement
+
+        let sensorNameInput = formParent.querySelector("#input-sensor-name")
+        let sensorTypeInput = formParent.querySelector("#input-sensor-type")
+        let sensorColorBgInput = formParent.querySelector("#input-sensor-bgcolor")
+        let sensorColorInput = formParent.querySelector("#input-sensor-color")
+        let sensorFiltersInput = formParent.querySelector("#input-sensor-filters")
+        let sensorIntervalInput = formParent.querySelector("#input-sensor-interval")
+
+        let calledCanvasIdx = Array.from( document.getElementsByClassName("graph") ).indexOf(
+            targetElem.parentElement.parentElement.parentElement.parentElement.querySelectorAll("canvas")[0]
+        )
+        let chartDataUpdated = JSON.parse( new DataStorage().getItem("graphsData") )
+
+        chartDataUpdated[calledCanvasIdx] = [ sensorNameInput.value, sensorTypeInput.value, sensorColorBgInput.value, sensorColorInput.value, sensorFiltersInput.value.split("\n"), sensorIntervalInput.value]
+        
+        
+        new DataStorage().setItem("graphsData", JSON.stringify( chartDataUpdated ))
+
+        formParent.parentElement.style.display = "none"
+        window.location.reload()
+        
+
+
+        
+
+      }
+
+
+      function loadUpdate(targetElem){
+        let formParent = targetElem.parentElement.querySelectorAll(".edit-menu")[0];
+        formParent.style.display = "flex"
+
+
+        let sensorNameInput = formParent.querySelector("#input-sensor-name")
+        let sensorTypeInput = formParent.querySelector("#input-sensor-type")
+        let sensorColorBgInput = formParent.querySelector("#input-sensor-bgcolor")
+        let sensorColorInput = formParent.querySelector("#input-sensor-color")
+        let sensorFiltersInput = formParent.querySelector("#input-sensor-filters")
+        let sensorIntervalInput = formParent.querySelector("#input-sensor-interval")
+
+        
+
+        let calledCanvasIdx = Array.from( document.getElementsByClassName("graph") ).indexOf(
+            targetElem.parentElement.querySelectorAll("canvas")[0]
+        )
+
+        console.log(calledCanvasIdx)
+
+        let chartData = JSON.parse( new DataStorage().getItem("graphsData") )[calledCanvasIdx]
+
+
+        sensorNameInput.value = chartData[0]
+        sensorTypeInput.value = chartData[1]
+        sensorColorBgInput.value = chartData[2]
+        sensorColorInput.value = chartData[3]
+        sensorFiltersInput.value = chartData[4].join("\n")
+        sensorIntervalInput.value = chartData[5]
+        
+
+
+      }
+    </script>
+    
+    <style>
+      .edit-menu {
+        
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid #ffffff33;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        color: white;
+        text-align: center;
+
+        /* NEW: Flexbox centering */
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        padding: 2rem;
+        gap: 1rem;
+      }
+
+      .edit-menu h1 {
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        margin-bottom: 20px;
+        color: white;
+      }
+    </style>
+    
+    
+    
+    
+    
+    
+    
+  </div>
+</div>

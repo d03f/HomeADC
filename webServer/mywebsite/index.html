@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="libraries/custom/config.js"></script>
+    <script src="libraries/custom/storage.js"></script>
+
+    <link rel="stylesheet" href="../libraries/bootstrap.css">
+    <script src="../libraries/bootstrap.js"></script>
+
+
+    
+</head>
+<body>
+
+    <script>
+        if (new DataStorage().getItem("accountKey") == null){
+            window.location.replace("login/index.html")
+        } else {
+            window.location.replace("mainPage/index.html")
+        }
+    </script>
+    
+</body>
+</html>
