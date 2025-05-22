@@ -24,12 +24,12 @@ public class DemoProyectApplication {
 
 	@Bean
     CommandLineRunner run(ApiUserService userService, @Value("${app.admin.create-on-startup:false}") boolean createAdmin,
-    		@Value("${app.admin.default-username}") String username,
-    		@Value("${app.admin.default-password}") String password) {
+    		@Value("${app.admin.default-username}") String adminUsername,
+    		@Value("${app.admin.default-password}") String adminPassword) {
 		
         return args -> {
             if (createAdmin) {
-                userService.createAdminUser(username, password);
+                userService.createAdminUser(adminUsername, adminPassword);
             }
         };
     }
