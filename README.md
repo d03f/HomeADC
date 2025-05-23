@@ -1,4 +1,4 @@
-# ![Logo](webServer/homeADC/favicon.svg) HomeADC 
+# ![Logo](homeADCweb/homeADC/favicon.svg) HomeADC 
 
 ## An open source local home automation server to centralize all your sensors
 With the increasing popularity of inteligent devices, interest to connect everything and our depencendy on techonology to do basic tasks, weare goint torwards a completely online world.  
