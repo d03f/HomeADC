@@ -8,11 +8,11 @@
 		<version>3.4.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>demoProyect</artifactId>
+	<groupId>com.homeadc</groupId>
+	<artifactId>homeadc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>demoProyect</name>
-	<description>Demo project for Spring Boot</description>
+	<name>HomeADC</name>
+	<description>HomeADC is a home automation proyect based on springboot</description>
 	<url/>
 	<licenses>
 		<license/>
