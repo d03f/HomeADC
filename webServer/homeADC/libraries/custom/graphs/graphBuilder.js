@@ -45,17 +45,7 @@ class GraphBuilder {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {},
-
-                scales: {
-                    x: {
-                        type: 'time', // Important!
-                        time: {
-                            unit: 'minute' // or 'second', 'hour', etc.
-                        }
-                    }
-                    
-                }
+                plugins: {}
                 
             },
             

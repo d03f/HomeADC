@@ -1,6 +1,6 @@
 if(!new DataStorage().getItem("graphsData")){
     new DataStorage().setItem("graphsData", JSON.stringify([ 
-        ["test", "line", "#CCCCCC", "#FF0000", ["sort=timestamp,desc", "size=100"], "9999"],
+        ["test", "line", "#CCCCCC", "#FF0000", ["sort=timestamp,desc", "size=10"], "1000"],
         ["test", "bar", "#CCCCCC", "#FF00FF", ["sort=timestamp,desc", "size=100"], "1000"],      
         ["test",  "radar", "#CCCCCC", "#FFFF00", ["sort=timestamp,desc", "size=100"], "1000"],
         ["test", "line", "#CCCCCC", "#6B26AC", ["sort=timestamp,desc", "size=100"], "1000"]

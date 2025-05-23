@@ -21,6 +21,8 @@ import com.example.demoProyect.api.v1.repository.authentication.ApiKeyRepo;
 import com.example.demoProyect.api.v1.repository.authentication.ApiUserRepo;
 import com.example.demoProyect.api.v1.repository.data.DataUnitRepo;
 import com.example.demoProyect.api.v1.repository.data.SensorRepo;
+import com.example.demoProyect.api.v1.service.authentication.UserRoleManager;
+
 import jakarta.transaction.Transactional;
 
 @Service
@@ -29,20 +31,22 @@ public class SensorService {
 	private ApiUserRepo userRepo;
 	private DataUnitRepo dataUnitRepo;
 	private ApiKeyRepo apiKeyRepo;
+	private UserRoleManager accessService;
 	
 	private static final String DATA_UNIT_FIELD_NAME = "dataUnit";
-	private ApiUser stored;
-	
-	public SensorService(SensorRepo sensorRepo, ApiUserRepo userRepo, DataUnitRepo dataUnitRepo, ApiKeyRepo apiKeyRepo) {
+
+	public SensorService(SensorRepo sensorRepo, ApiUserRepo userRepo, DataUnitRepo dataUnitRepo, ApiKeyRepo apiKeyRepo, UserRoleManager accessService) {
 		this.sensorRepo = sensorRepo;
 		this.userRepo = userRepo;
 		this.dataUnitRepo = dataUnitRepo;
 		this.apiKeyRepo = apiKeyRepo;
+		this.accessService = accessService;
 	}
 	
 	@Transactional
-	public List<SensorDTO> getSensorsOfUser(String authorizationToken) throws InvalidUserAccountKeyCustEx{
+	public List<SensorDTO> getSensorsOfUser(String authorizationToken) throws InvalidUserAccountKeyCustEx, AccessDeniedCustEx{
 		ApiUser apiUser = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		accessService.canUserRead(apiUser);
 		
 		List<Sensor> userSensors = sensorRepo.findByOwner(apiUser);
 		
@@ -50,8 +54,9 @@ public class SensorService {
 	}
 
 	@Transactional
-	public SensorDTO createNewSensor(String authauthorizationToken, Map<String, String> requestData) throws InvalidUserAccountKeyCustEx, InvalidDataUnitCustEx, InvalidDataCustEx, DuplicatedEntryCustEx {
+	public SensorDTO createNewSensor(String authauthorizationToken, Map<String, String> requestData) throws InvalidUserAccountKeyCustEx, InvalidDataUnitCustEx, InvalidDataCustEx, DuplicatedEntryCustEx, AccessDeniedCustEx {
 		ApiUser creator = this.userRepo.findById(authauthorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		accessService.canUserWrite(creator);
 		
 		if (this.sensorRepo.findByNameAndOwner(requestData.get("name"), creator).isPresent()) { throw new DuplicatedEntryCustEx(); }
 		
@@ -78,8 +83,10 @@ public class SensorService {
 	}
 	
 	@Transactional
-	public SensorDTO removeSensor(String authauthorizationToken,String name) throws InvalidUserAccountKeyCustEx, InvalidDataUnitCustEx, InvalidDataCustEx, DuplicatedEntryCustEx {
+	public SensorDTO removeSensor(String authauthorizationToken,String name) throws InvalidUserAccountKeyCustEx, InvalidDataUnitCustEx, InvalidDataCustEx, DuplicatedEntryCustEx, AccessDeniedCustEx {
 		ApiUser creator = this.userRepo.findById(authauthorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		accessService.canUserWrite(creator);
+
 		Sensor toBeDeleted = this.sensorRepo.findByNameAndOwner(name, creator).orElseThrow(InvalidDataCustEx::new);
 		
 		this.sensorRepo.delete(toBeDeleted);
@@ -88,8 +95,9 @@ public class SensorService {
 	
 	}
 	@Transactional
-	public SensorDTO getOneSensorOfUser(String authorizationToken, String searchName) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx {
+	public SensorDTO getOneSensorOfUser(String authorizationToken, String searchName) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, AccessDeniedCustEx {
 		ApiUser creator = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		accessService.canUserRead(creator);
 
 		return new SensorDTO(
 				this.sensorRepo.findByNameAndOwner(searchName, creator).orElseThrow(InvalidDataCustEx::new)
@@ -100,15 +108,14 @@ public class SensorService {
 	public SensorDTO addNewApiKeyToSensor(String authorizationToken, String apiKeyToAdd, String nameOfSensor) 
 			throws InvalidUserAccountKeyCustEx, AccessDeniedCustEx, InvalidApiKeyCustEx, DuplicatedEntryCustEx {
 		
-		
 		ApiUser ownerAndUser = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		accessService.canUserWrite(ownerAndUser);
 
-		this.stored = ownerAndUser;
+
 		
 		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, ownerAndUser).orElseThrow(AccessDeniedCustEx::new);
 		
 		ApiKey apiKey = this.apiKeyRepo.findById(apiKeyToAdd).orElseThrow(InvalidApiKeyCustEx::new);
-		
 		if (toUpdateSensor.containsAllowedApikey(apiKey)) { throw new DuplicatedEntryCustEx(); }
 		
 		toUpdateSensor.addAllowedApiKey(apiKey);
@@ -122,6 +129,7 @@ public class SensorService {
 			throws AccessDeniedCustEx, InvalidApiKeyCustEx, DuplicatedEntryCustEx, InvalidUserAccountKeyCustEx {
 		ApiKey apiKey = this.apiKeyRepo.findByApiKeyValueAndKeyEnabledTrue(apiKeyValue).orElseThrow(InvalidApiKeyCustEx::new);
 		ApiUser owner = apiKey.getOwner();
+		accessService.canUserWrite(owner);
 		
 		return this.addNewApiKeyToSensor(owner.getUserAccountKey(), apiKeyValue, nameOfSensor);
 	}
@@ -132,6 +140,9 @@ public class SensorService {
 			throws InvalidUserAccountKeyCustEx, AccessDeniedCustEx, InvalidApiKeyCustEx, InvalidDataCustEx {
 		
 		ApiUser ownerAndUser = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		accessService.canUserWrite(ownerAndUser);
+		
+		
 		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, ownerAndUser).orElseThrow(AccessDeniedCustEx::new);
 		
 		ApiKey apiKey = this.apiKeyRepo.findById(apiKeyToAdd).orElseThrow(InvalidApiKeyCustEx::new);
@@ -149,6 +160,9 @@ public class SensorService {
 			throws AccessDeniedCustEx, InvalidApiKeyCustEx, InvalidDataCustEx {
 		ApiKey apiKey = this.apiKeyRepo.findByApiKeyValueAndKeyEnabledTrue(apiKeyValue).orElseThrow(InvalidApiKeyCustEx::new);
 		ApiUser owner = apiKey.getOwner();
+		accessService.canUserWrite(owner);
+		
+		
 		Sensor toUpdateSensor = this.sensorRepo.findByNameAndOwner(nameOfSensor, owner).orElseThrow(AccessDeniedCustEx::new);
 		
 		if (!toUpdateSensor.containsAllowedApikey(apiKey)) { throw new InvalidDataCustEx(); }

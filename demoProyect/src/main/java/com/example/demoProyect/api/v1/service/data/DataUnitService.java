@@ -5,27 +5,33 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.example.demoProyect.api.v1.model.authentication.ApiUser;
 import com.example.demoProyect.api.v1.model.data.DataUnit;
 import com.example.demoProyect.api.v1.model.data.dto.DataUnitDTO;
+import com.example.demoProyect.api.v1.model.exceptions.AccessDeniedCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.DuplicatedEntryCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidUserAccountKeyCustEx;
 import com.example.demoProyect.api.v1.repository.authentication.ApiUserRepo;
 import com.example.demoProyect.api.v1.repository.data.DataUnitRepo;
+import com.example.demoProyect.api.v1.service.authentication.UserRoleManager;
 
 @Service
 public class DataUnitService {
 
 	private DataUnitRepo dataUnitRepo;
 	private ApiUserRepo userRepo;
+	private UserRoleManager accessService;
 	
-	public DataUnitService(DataUnitRepo dataUnitRepo, ApiUserRepo userRepo) {
+	public DataUnitService(DataUnitRepo dataUnitRepo, ApiUserRepo userRepo, UserRoleManager accessService) {
 		this.dataUnitRepo = dataUnitRepo;
 		this.userRepo = userRepo;
+		this.accessService = accessService;
 	}
 	
-	public DataUnitDTO createNewDataUnit(String authorizationToken,  Map<String, String> requestData) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, DuplicatedEntryCustEx {
-		this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+	public DataUnitDTO createNewDataUnit(String authorizationToken,  Map<String, String> requestData) throws InvalidUserAccountKeyCustEx, InvalidDataCustEx, DuplicatedEntryCustEx, AccessDeniedCustEx {
+		ApiUser usedUser = this.userRepo.findById(authorizationToken).orElseThrow(InvalidUserAccountKeyCustEx::new);
+		accessService.canUserWrite(usedUser);
 		
 		DataUnit created = new DataUnit();
 		

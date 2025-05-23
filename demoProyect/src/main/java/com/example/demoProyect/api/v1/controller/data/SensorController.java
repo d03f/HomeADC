@@ -45,7 +45,7 @@ public class SensorController {
 					this.sensorService.getSensorsOfUser(
 							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new)
 						));
-		} catch ( InvalidUserAccountKeyCustEx e) {
+		} catch ( InvalidUserAccountKeyCustEx | AccessDeniedCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
 		}
 	}
@@ -57,7 +57,7 @@ public class SensorController {
 					this.sensorService.getOneSensorOfUser(
 							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new), value
 						));
-		} catch ( InvalidUserAccountKeyCustEx | InvalidDataCustEx e) {
+		} catch ( InvalidUserAccountKeyCustEx | InvalidDataCustEx | AccessDeniedCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
 		}
 	}
@@ -70,7 +70,7 @@ public class SensorController {
 					this.sensorService.createNewSensor(
 							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new), requestData
 						));
-		} catch ( InvalidUserAccountKeyCustEx | InvalidDataUnitCustEx | InvalidDataCustEx | DuplicatedEntryCustEx e) {
+		} catch ( InvalidUserAccountKeyCustEx | InvalidDataUnitCustEx | InvalidDataCustEx | DuplicatedEntryCustEx | AccessDeniedCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
 		}
 	}
@@ -83,7 +83,7 @@ public class SensorController {
 					this.sensorService.removeSensor(
 							parserService.parseAccountKeyFromHeader(authorizationHeader).orElseThrow(InvalidUserAccountKeyCustEx::new), value
 						));
-		} catch ( InvalidUserAccountKeyCustEx | InvalidDataUnitCustEx | InvalidDataCustEx | DuplicatedEntryCustEx e) {
+		} catch ( InvalidUserAccountKeyCustEx | InvalidDataUnitCustEx | InvalidDataCustEx | DuplicatedEntryCustEx | AccessDeniedCustEx e) {
 			return CustomResponseError.build( e.getMessage() );
 		}
 	}

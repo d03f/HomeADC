@@ -13,15 +13,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.demoProyect.api.v1.model.authentication.ApiKey;
+import com.example.demoProyect.api.v1.model.authentication.UserRole;
 import com.example.demoProyect.api.v1.model.data.Sensor;
 import com.example.demoProyect.api.v1.model.data.SensorRecord;
 import com.example.demoProyect.api.v1.model.data.dto.SensorRecordDTO;
+import com.example.demoProyect.api.v1.model.exceptions.AccessDeniedCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidSensorCustEx;
 import com.example.demoProyect.api.v1.repository.authentication.ApiKeyRepo;
 import com.example.demoProyect.api.v1.repository.data.SensorRecordRepo;
 import com.example.demoProyect.api.v1.repository.data.SensorRepo;
 import com.example.demoProyect.api.v1.repository.specifications.SensorRecordSpecifications;
+import com.example.demoProyect.api.v1.service.authentication.UserRoleManager;
 
 import jakarta.transaction.Transactional;
 
@@ -31,11 +34,13 @@ public class SensorRecordService {
 	private SensorRecordRepo recordRepo;
 	private ApiKeyRepo apiRepo;
 	private SensorRepo sensorRepo;
+	private UserRoleManager accessService;
 	
-	public SensorRecordService(SensorRecordRepo recordRepo, ApiKeyRepo apiRepo, SensorRepo sensorRepo) {
+	public SensorRecordService(SensorRecordRepo recordRepo, ApiKeyRepo apiRepo, SensorRepo sensorRepo, UserRoleManager accessService) {
 		this.recordRepo = recordRepo; 
 		this.apiRepo = apiRepo;
 		this.sensorRepo = sensorRepo;
+		this.accessService = accessService;
 	}
 	
 	@Transactional
@@ -44,8 +49,10 @@ public class SensorRecordService {
 			Optional<String> minValue, Optional<String> maxValue,
 			Optional<String> startDate, Optional<String> endDate,
 			Optional<String> metadataContains, 
-			Pageable pageable ) throws InvalidApiKeyCustEx, InvalidSensorCustEx{
+			Pageable pageable ) throws InvalidApiKeyCustEx, InvalidSensorCustEx, AccessDeniedCustEx{
 		ApiKey usedApikey = this.apiRepo.findByApiKeyValueAndKeyEnabledTrue(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+		accessService.canKeyRead(usedApikey);
+		
 		this.sensorRepo.findByNameAndAllowedApiKeys_ApiKeyValue(sensorName, usedApikey.getApiKeyValue()).orElseThrow(InvalidSensorCustEx::new);
 		
 		
@@ -86,10 +93,10 @@ public class SensorRecordService {
 	
 	
 	@Transactional
-	public SensorRecordDTO postSensorRecord(String apiKey, String sensorName, @RequestBody Map<String, String> requestData) throws InvalidApiKeyCustEx, InvalidSensorCustEx {
-		this.apiRepo.findByApiKeyValueAndKeyEnabledTrue(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+	public SensorRecordDTO postSensorRecord(String apiKey, String sensorName, @RequestBody Map<String, String> requestData) throws InvalidApiKeyCustEx, InvalidSensorCustEx, AccessDeniedCustEx {
+		ApiKey sender = this.apiRepo.findByApiKeyValueAndKeyEnabledTrue(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+		accessService.canKeyWrite(sender);
 		
-		this.sensorRepo.findByName(sensorName).orElseThrow(InvalidSensorCustEx::new);
 		
 		Sensor usedSensor = this.sensorRepo.findByNameAndAllowedApiKeys_ApiKeyValue(sensorName, apiKey).orElseThrow(InvalidSensorCustEx::new);
 		
@@ -106,8 +113,10 @@ public class SensorRecordService {
 		return new SensorRecordDTO(sensorRecord);
 	}
 
-	public SensorRecordDTO getMaxMinSensorRecord(String apiKey, String sensorName, String option) throws InvalidApiKeyCustEx, InvalidSensorCustEx, NullPointerException {
-		this.apiRepo.findByApiKeyValueAndKeyEnabledTrue(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+	public SensorRecordDTO getMaxMinSensorRecord(String apiKey, String sensorName, String option) throws InvalidApiKeyCustEx, InvalidSensorCustEx, NullPointerException, AccessDeniedCustEx {
+		ApiKey sended = this.apiRepo.findByApiKeyValueAndKeyEnabledTrue(apiKey).orElseThrow(InvalidApiKeyCustEx::new);
+		accessService.canKeyRead(sended);
+		
 		
 		this.sensorRepo.findByName(sensorName).orElseThrow(InvalidSensorCustEx::new);
 		this.sensorRepo.findByNameAndAllowedApiKeys_ApiKeyValue(sensorName, apiKey).orElseThrow(InvalidSensorCustEx::new);
