@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseError;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseOk;
+import com.example.demoProyect.api.v1.model.exceptions.AccessDeniedCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.DuplicatedEntryCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidDataCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidUserAccountKeyCustEx;
@@ -46,7 +47,7 @@ public class DataUnitController {
 							requestData) 
 					);
 			
-		} catch (InvalidUserAccountKeyCustEx | InvalidDataCustEx | DuplicatedEntryCustEx e) { return CustomResponseError.build( e.getMessage()); } 
+		} catch (InvalidUserAccountKeyCustEx | InvalidDataCustEx | DuplicatedEntryCustEx | AccessDeniedCustEx e) { return CustomResponseError.build( e.getMessage()); } 
 	}
 
 }

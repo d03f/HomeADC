@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseError;
 import com.example.demoProyect.api.v1.controller.responses.CustomResponseOk;
+import com.example.demoProyect.api.v1.model.exceptions.AccessDeniedCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidApiKeyCustEx;
 import com.example.demoProyect.api.v1.model.exceptions.InvalidSensorCustEx;
 import com.example.demoProyect.api.v1.service.RequestDataParserService;
@@ -55,7 +56,7 @@ public class SensorRecordController {
 					this.dataParser.parseApiKeyFromHeader(authorizationHeader).orElseThrow(InvalidApiKeyCustEx::new), name,
 					minValue, maxValue, startDate, endDate, metadataContains, pageable)
 				);
-		} catch (InvalidApiKeyCustEx | InvalidSensorCustEx e) { return CustomResponseError.build(e); }
+		} catch (InvalidApiKeyCustEx | InvalidSensorCustEx | AccessDeniedCustEx e) { return CustomResponseError.build(e); }
 		
 	}
 	
@@ -68,7 +69,7 @@ public class SensorRecordController {
 					this.recordService.getMaxMinSensorRecord(
 							this.dataParser.parseApiKeyFromHeader(authorizationHeader).orElseThrow(InvalidApiKeyCustEx::new), name, option)
 				);
-		} catch (InvalidApiKeyCustEx | InvalidSensorCustEx  e) { return CustomResponseError.build(e); }
+		} catch (InvalidApiKeyCustEx | InvalidSensorCustEx | AccessDeniedCustEx  e) { return CustomResponseError.build(e); }
 		catch (NullPointerException e) { return CustomResponseError.build(e.getMessage()); } 
 		
 	}
@@ -85,7 +86,7 @@ public class SensorRecordController {
 						name, requestData)
 				);
 		} 
-		catch (InvalidApiKeyCustEx | InvalidSensorCustEx e) { return CustomResponseError.build(e); }
+		catch (InvalidApiKeyCustEx | InvalidSensorCustEx | AccessDeniedCustEx e) { return CustomResponseError.build(e); }
 		catch (NullPointerException | NumberFormatException e) { return CustomResponseError.build(e.getMessage()); }
 				
 	}
