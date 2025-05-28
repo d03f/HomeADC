@@ -1,14 +1,14 @@
 # ![Logo](homeADCweb/homeADC/favicon.svg) HomeADC 
 
 ## An open source local home automation server to centralize all your sensors
-With the increasing popularity of inteligent devices, interest to connect everything and our depencendy on techonology to do basic tasks, weare goint torwards a completely online world.  
+With the increasing popularity of inteligent devices, interest to connect everything and our depencendy on techonology to do basic tasks, we are goint towards a completely online world.  
 We like the idea, and specially when it comes to home automation, but we dont like big enterprises.  
 So, with the aim for security and customization, we developed HomeADC.  
 
-The server we developed is local, it doesnt make any calls outside of your local network.
-All the administratiion of the users, permisions, apikeys... is at your fingertips, you own everything!
+The server we developed is fully local, it doesnt make any calls outside of your local network.
+All the administration of the users, permisions, apikeys... is at your fingertips, you own everything!
 
-This also means that is highly customizable, you can do with the source code as you like, and if you find any weakpoints or things tou improve, 
+This also means that is highly customizable, you can do with the source code as you like, and if you find any weakpoints or things to improve, 
 dont hesitate to submit any change!
 
 The idea is that you create you own diy sensors, since we think this is the best way to know for sure what they do and who they send data to.
@@ -35,9 +35,9 @@ The frontend, which is totally independent, is a boundle of basic .html .css and
 
 
 ## Your sensors
-We are tinkers, and we love programming our own microcontrollers, so when we created this proyect we focused it in diy sensors.  
-With commercially avaliable sensors, you have to do a really deep down investigation to knoow how your sensors report the data and to who.  
-We dont like that, so our best oslution is to create your own sensors. With some microcontrollers, solder and a coupe of sensors you will be rolling in no time.  
+We are tinkers, and we love programming our own microcontrollers, so when we created this proyect to work with diy sensors.  
+With commercially avaliable sensors, you have to do a really deep down investigation to know how your sensors report the data and to whom.  
+We dont like that, so our best solution is to create your own sensors. With some microcontrollers, solder and a coupe of sensors you will be rolling in no time.  
 
 We choose Micropython as our firmware for the sensors since its easy for anyone to learn and use. To flash micropython on your controllers, take a look at their docs, they are usefull.  
 So, we provide the basic files so we do the boring part of connecting, sending the data... So all you have to do it edit your `properties.json` file and use our libraries to send all the data you like.  
@@ -46,7 +46,7 @@ If your prefer some other firmwware, such as Arduino, CircuitPython or similars,
 But dont worry, with some experience and our [api docs](docs/API_Documentation.md) it will be really easy.  
 
 If you have some experience in hardware hacking or creating your own firmware for commercially avaliable home automation devices, we will be eagered to learn!
-Also, consider uploading it, so the community has something!
+Also, consider uploading it for the community!
 
 
 Have fun!!
