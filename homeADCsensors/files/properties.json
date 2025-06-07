@@ -1,0 +1,13 @@
+{
+    "apiKey": "YOUR_API_KEY",
+    
+    "serverUrl" : "http://YOUR_SERVER_IP:PORT/api/v1/records/",
+    "sensorName" : "YOUR_SENSOR_NAME",
+
+    "sleepTime" : 2,
+
+    "wifi":{
+        "SSID" : "WIFI_SSID",
+        "password" : "WIFI_PASSWORD"
+    }
+}
