@@ -1,6 +1,7 @@
 import machine, onewire, ds18x20, time
+from customCode import CustomClass
 
-class SensorDS18B20:
+class SensorDS18B20(CustomClass):
     
     def __init__(self, pin=2):
         self.device = ds18x20.DS18X20(  onewire.OneWire( machine.Pin(pin) )  )
