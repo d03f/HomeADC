@@ -21,7 +21,7 @@ These are the docs for the main parts of the software:
 
 [Api docs](docs/API_Documentation.md) 
 
-[Web server](homeADCweb/README.md)
+[Web server docs](docs/Web_Documentation.md)
 
 
 
